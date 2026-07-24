@@ -1,0 +1,96 @@
+import type { Metadata, Viewport } from "next";
+import { Poppins } from "next/font/google";
+import "./globals.css";
+import { AuthProvider } from "@/components/AuthProvider";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://swarnamaala.in";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "swarnamaala.in | Custom Photo Fridge Magnets Online in India",
+    template: "%s | swarnamaala.in",
+  },
+  description:
+    "Create premium personalised photo fridge magnets online. Upload your favourite pictures, choose a pack of 1, 3, 6 or 10 magnets from just \u20B999, and get them delivered across India.",
+  keywords: [
+    "custom fridge magnets",
+    "photo fridge magnets",
+    "personalised magnets India",
+    "picture magnets online",
+    "custom photo magnets",
+    "fridge magnets Noida Delhi Gurugram",
+    "swarnamaala",
+  ],
+  authors: [{ name: "swarnamaala.in" }],
+  creator: "swarnamaala.in",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: SITE_URL,
+    siteName: "swarnamaala.in",
+    title: "Custom Photo Fridge Magnets Online in India | swarnamaala.in",
+    description:
+      "Turn your memories into premium custom fridge magnets. Packs from \u20B999. Upload your photos and we deliver across India.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Custom Photo Fridge Magnets Online | swarnamaala.in",
+    description:
+      "Turn your memories into premium custom fridge magnets. Packs from \u20B999. Delivered across India.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  category: "shopping",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a1024",
+  width: "device-width",
+  initialScale: 1,
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "swarnamaala.in",
+    url: SITE_URL,
+    logo: `${SITE_URL}/icon.svg`,
+    description: "Custom photo fridge magnets printed and delivered across India.",
+    areaServed: "IN",
+  };
+
+  return (
+    <html lang="en" className={poppins.variable}>
+      <body className="font-sans antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+        <AuthProvider>
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
