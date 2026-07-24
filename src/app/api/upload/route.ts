@@ -5,6 +5,11 @@ import crypto from "crypto";
 import { getSessionUser } from "@/lib/auth";
 import { s3Configured, uploadToS3 } from "@/lib/s3";
 
+// mongoose / aws-sdk need the Node.js runtime (not edge), and image uploads
+// can take a little longer than the default limit.
+export const runtime = "nodejs";
+export const maxDuration = 30;
+
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED = new Map<string, string>([
   ["image/jpeg", "jpg"],

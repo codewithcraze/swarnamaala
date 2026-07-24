@@ -4,7 +4,7 @@ import OrdersClient from "./OrdersClient";
 
 export const metadata: Metadata = {
   title: "My Orders",
-  description: "View and track your custom fridge magnet orders.",
+  description: "View and track your custom photo magnet orders.",
   robots: { index: false, follow: false },
 };
 

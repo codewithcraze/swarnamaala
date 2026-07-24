@@ -4,7 +4,7 @@ import SignInForm from "./SignInForm";
 
 export const metadata: Metadata = {
   title: "Sign In",
-  description: "Sign in to your swarnamaala.in account to order custom fridge magnets.",
+  description: "Sign in to your swarnamaala.in account to order custom photo magnets.",
   robots: { index: false, follow: true },
 };
 

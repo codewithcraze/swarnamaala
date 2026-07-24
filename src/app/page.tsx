@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PRICING_TIERS, CURRENCY_SYMBOL } from "@/lib/pricing";
 import { REVIEWS, AVERAGE_RATING } from "@/lib/reviews";
 import Reviews from "@/components/Reviews";
@@ -7,9 +8,9 @@ export default function HomePage() {
   const productJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: "Custom Photo Fridge Magnet",
+    name: "Custom Photo Magnet",
     description:
-      "Personalised photo fridge magnets printed on premium material. Upload your photos and choose a pack of 1, 3, 6 or 10.",
+      "Personalised custom photo magnets printed on premium material. Upload your photos and choose a pack of 1, 3, 6 or 10.",
     brand: { "@type": "Brand", name: "swarnamaala.in" },
     aggregateRating: {
       "@type": "AggregateRating",
@@ -34,12 +35,9 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4  sm:px-6 md:grid-cols-2">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-4 sm:px-6 md:grid-cols-2">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-              Premium custom photo magnets
-            </span>
+            
             <h1 className="mt-5 text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
               Your memories,
               <span className="block bg-gradient-to-r from-blue-400 via-sky-400 to-indigo-400 bg-clip-text text-transparent">
@@ -48,11 +46,11 @@ export default function HomePage() {
             </h1>
             <p className="mt-5 max-w-lg text-lg leading-relaxed text-slate-400">
               Upload your favourite photos and we&apos;ll turn them into beautiful, durable
-              fridge magnets. Packs starting at just {CURRENCY_SYMBOL}99, delivered across India.
+              custom magnets. Packs starting at just {CURRENCY_SYMBOL}99, delivered across India.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
-                href="/products/fridge-magnets"
+                href="/products/custom-magnets"
                 className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-blue-500/30 transition-transform hover:scale-[1.03]"
               >
                 Create your magnets
@@ -80,10 +78,10 @@ export default function HomePage() {
           <div className="relative">
             <div className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-blue-500/10 blur-3xl" />
             <div className="grid grid-cols-2 gap-4">
-              <MagnetCard className="from-rose-500/80 to-pink-600/80" emoji={"\uD83D\uDCF8"} label="Family" rotate="-rotate-3" />
-              <MagnetCard className="from-sky-500/80 to-blue-600/80" emoji={"\u2764\uFE0F"} label="Couple" rotate="rotate-3 mt-8" />
-              <MagnetCard className="from-amber-500/80 to-orange-600/80" emoji={"\uD83C\uDF89"} label="Birthday" rotate="rotate-2" />
-              <MagnetCard className="from-emerald-500/80 to-teal-600/80" emoji={"\u2708\uFE0F"} label="Travel" rotate="-rotate-2 mt-6" />
+              <MagnetCard className="from-rose-500/80 to-pink-600/80" src="/family.avif" label="Family" rotate="-rotate-3" />
+              <MagnetCard className="from-sky-500/80 to-blue-600/80" src="/love.avif" label="Couple" rotate="rotate-3 mt-8" />
+              <MagnetCard className="from-amber-500/80 to-orange-600/80" src="/birthday.avif" label="Birthday" rotate="rotate-2" />
+              <MagnetCard className="from-emerald-500/80 to-teal-600/80" src="/travel.avif" label="Travel" rotate="-rotate-2 mt-6" />
             </div>
           </div>
         </div>
@@ -111,7 +109,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Three simple steps</h2>
           <p className="mt-3 text-slate-400">
-            From your camera roll to your fridge door in no time.
+            From your camera roll to your doorstep in no time.
           </p>
         </div>
         <div className="mt-14 grid gap-8 md:grid-cols-3">
@@ -176,7 +174,7 @@ export default function HomePage() {
                   {tier.perPiece} per magnet
                 </p>
                 <Link
-                  href={`/products/fridge-magnets?qty=${tier.quantity}`}
+                  href={`/products/custom-magnets?qty=${tier.quantity}`}
                   className="mt-6 block rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
                 >
                   Choose pack
@@ -217,10 +215,10 @@ export default function HomePage() {
             Ready to make your memories magnetic?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-blue-100/90">
-            Upload your photos today and get premium fridge magnets delivered to your door.
+            Upload your photos today and get premium custom magnets delivered to your door.
           </p>
           <Link
-            href="/products/fridge-magnets"
+            href="/products/custom-magnets"
             className="mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-base font-semibold text-blue-700 shadow-lg transition-transform hover:scale-[1.03]"
           >
             Start creating
@@ -233,12 +231,12 @@ export default function HomePage() {
 
 function MagnetCard({
   className,
-  emoji,
+  src,
   label,
   rotate,
 }: {
   className: string;
-  emoji: string;
+  src: string;
   label: string;
   rotate: string;
 }) {
@@ -246,9 +244,16 @@ function MagnetCard({
     <div
       className={`animate-floaty rounded-2xl bg-gradient-to-br ${className} p-1.5 shadow-2xl ${rotate}`}
     >
-      <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm">
-        <div className="grid aspect-square place-items-center rounded-lg bg-slate-950/40 text-5xl">
-          {emoji}
+      <div className="rounded-xl bg-white/10 p-2 backdrop-blur-sm">
+        <div className="relative aspect-square overflow-hidden rounded-lg bg-slate-950/40">
+          <Image
+            src={src}
+            alt={`${label} custom magnet`}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 45vw, 260px"
+            priority
+          />
         </div>
         <p className="mt-2 text-center text-sm font-semibold text-white">{label}</p>
       </div>

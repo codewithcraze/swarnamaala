@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "swarnamaala.in - Custom Fridge Magnets",
+    name: "swarnamaala.in - Custom Photo Magnets",
     short_name: "swarnamaala",
     description:
-      "Create premium personalised photo fridge magnets online and get them delivered across India.",
+      "Create premium personalised custom photo magnets online and get them delivered across India.",
     start_url: "/",
     display: "standalone",
     background_color: "#fffdf8",

@@ -4,7 +4,7 @@ import EditOrderClient from "./EditOrderClient";
 
 export const metadata: Metadata = {
   title: "Edit Order",
-  description: "Edit your custom fridge magnet order.",
+  description: "Edit your custom photo magnet order.",
   robots: { index: false, follow: false },
 };
 

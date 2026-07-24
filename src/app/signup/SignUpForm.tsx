@@ -9,7 +9,7 @@ export default function SignUpForm() {
   const { register } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/products/fridge-magnets";
+  const redirect = searchParams.get("redirect") || "/products/custom-magnets";
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
   const [error, setError] = useState("");

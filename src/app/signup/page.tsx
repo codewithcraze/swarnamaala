@@ -4,7 +4,7 @@ import SignUpForm from "./SignUpForm";
 
 export const metadata: Metadata = {
   title: "Create Account",
-  description: "Create a swarnamaala.in account to order custom photo fridge magnets.",
+  description: "Create a swarnamaala.in account to order custom photo magnets.",
   robots: { index: false, follow: true },
 };
 

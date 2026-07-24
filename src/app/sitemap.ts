@@ -12,7 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${SITE_URL}/products/fridge-magnets`,
+      url: `${SITE_URL}/products/custom-magnets`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,

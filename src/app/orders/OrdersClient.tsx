@@ -100,7 +100,7 @@ export default function OrdersClient() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-white">My Orders</h1>
         <Link
-          href="/products/fridge-magnets"
+          href="/products/custom-magnets"
           className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white"
         >
           New order
@@ -112,10 +112,10 @@ export default function OrdersClient() {
           <div className="text-5xl">{"\uD83E\uDDF2"}</div>
           <p className="mt-4 text-lg font-semibold text-white">No orders yet</p>
           <p className="mt-1 text-sm text-slate-400">
-            Upload your photos and create your first custom fridge magnet.
+            Upload your photos and create your first custom magnet.
           </p>
           <Link
-            href="/products/fridge-magnets"
+            href="/products/custom-magnets"
             className="mt-6 inline-block rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white"
           >
             Start creating

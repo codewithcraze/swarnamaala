@@ -11,7 +11,7 @@ export default function Footer() {
             </span>
           </div>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-400">
-            Turn your favourite memories into premium custom fridge magnets. Upload your
+            Turn your favourite memories into premium custom photo magnets. Upload your
             photos, pick a pack, and we deliver beautifully printed magnets to your door
             across Delhi NCR and all of India.
           </p>
@@ -21,8 +21,8 @@ export default function Footer() {
           <h3 className="text-sm font-semibold text-white">Shop</h3>
           <ul className="mt-4 space-y-2 text-sm text-slate-400">
             <li>
-              <Link href="/products/fridge-magnets" className="hover:text-blue-400">
-                Fridge Magnets
+              <Link href="/products/custom-magnets" className="hover:text-blue-400">
+                Custom Magnets
               </Link>
             </li>
             <li>

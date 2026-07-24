@@ -11,7 +11,7 @@ export const REVIEWS: Review[] = [
     name: "Ananya Sharma",
     location: "Sector 62, Noida",
     rating: 5,
-    text: "The quality blew me away. My wedding photos look stunning on the fridge and the colours are so rich. Delivered to Noida in just 3 days!",
+    text: "The quality blew me away. My wedding photos look stunning as magnets and the colours are so rich. Delivered to Noida in just 3 days!",
   },
   {
     name: "Rahul Verma",

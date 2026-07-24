@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     await connectToDatabase();
     const order = await Order.create({
       user: session.id,
-      product: "Custom Fridge Magnet",
+      product: "Custom Photo Magnet",
       quantity: tier.quantity,
       unitLabel: tier.label,
       amount,

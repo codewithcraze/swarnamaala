@@ -17,18 +17,18 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://swarnamaala.in";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "swarnamaala.in | Custom Photo Fridge Magnets Online in India",
+    default: "swarnamaala.in | Custom Photo Magnets Online in India",
     template: "%s | swarnamaala.in",
   },
   description:
-    "Create premium personalised photo fridge magnets online. Upload your favourite pictures, choose a pack of 1, 3, 6 or 10 magnets from just \u20B999, and get them delivered across India.",
+    "Create premium personalised custom photo magnets online. Upload your favourite pictures, choose a pack of 1, 3, 6 or 10 magnets from just \u20B999, and get them delivered across India.",
   keywords: [
-    "custom fridge magnets",
-    "photo fridge magnets",
+    "custom magnets",
+    "custom photo magnets",
     "personalised magnets India",
     "picture magnets online",
-    "custom photo magnets",
-    "fridge magnets Noida Delhi Gurugram",
+    "photo magnets",
+    "custom magnets Noida Delhi Gurugram",
     "swarnamaala",
   ],
   authors: [{ name: "swarnamaala.in" }],

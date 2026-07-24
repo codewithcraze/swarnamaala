@@ -21,7 +21,7 @@ const OrderSchema = new Schema(
       required: true,
       index: true,
     },
-    product: { type: String, required: true, default: "Custom Fridge Magnet" },
+    product: { type: String, required: true, default: "Custom Photo Magnet" },
     quantity: { type: Number, required: true, min: 1 },
     unitLabel: { type: String, required: true },
     amount: { type: Number, required: true, min: 0 },

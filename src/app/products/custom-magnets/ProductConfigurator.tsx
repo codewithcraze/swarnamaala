@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { PRICING_TIERS, getTier, CURRENCY_SYMBOL } from "@/lib/pricing";
 
+const PRODUCT_PATH = "/products/custom-magnets";
+
 type Address = {
   fullName: string;
   phone: string;
@@ -43,6 +45,7 @@ export default function ProductConfigurator() {
   const [note, setNote] = useState("");
   const [address, setAddress] = useState<Address>(EMPTY_ADDRESS);
   const [error, setError] = useState("");
+  const [needsLogin, setNeedsLogin] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -79,7 +82,7 @@ export default function ProductConfigurator() {
     setError("");
 
     if (!user) {
-      setError("Please sign in before uploading your photos.");
+      setNeedsLogin(true);
       return;
     }
 
@@ -114,7 +117,7 @@ export default function ProductConfigurator() {
 
   function openPicker() {
     if (!user) {
-      setError("Please sign in before uploading your photos.");
+      setNeedsLogin(true);
       return;
     }
     fileRef.current?.click();
@@ -125,7 +128,7 @@ export default function ProductConfigurator() {
     setError("");
 
     if (!user) {
-      router.push("/signin?redirect=/products/fridge-magnets");
+      router.push(`/signin?redirect=${PRODUCT_PATH}`);
       return;
     }
     if (images.length !== quantity) {
@@ -168,7 +171,7 @@ export default function ProductConfigurator() {
         <Link href="/" className="hover:text-blue-400">
           Home
         </Link>{" "}
-        / <span className="text-slate-300">Custom Fridge Magnets</span>
+        / <span className="text-slate-300">Custom Photo Magnets</span>
       </nav>
 
       <div className="grid gap-10 lg:grid-cols-2">
@@ -214,17 +217,17 @@ export default function ProductConfigurator() {
               </div>
             )}
             <p className="mt-5 text-center text-xs text-slate-500">
-              Magnets are printed on premium material with a glossy finish.
+              Each magnet is printed on premium material with a glossy, durable finish.
             </p>
           </div>
 
           <h1 className="mt-8 text-2xl font-bold text-white sm:text-3xl">
-            Custom Photo Fridge Magnets
+            Custom Photo Magnets
           </h1>
           <p className="mt-3 leading-relaxed text-slate-400">
-            Turn any photo into a premium fridge magnet. Perfect for family pictures,
-            travel memories, pets, and gifts. Upload one photo per magnet, or reuse the
-            same photo for the whole pack.
+            Turn any photo into a premium custom magnet. Perfect for family pictures,
+            travel memories, pets, logos, and gifts. Upload one photo per magnet, or reuse
+            the same photo for the whole pack.
           </p>
         </div>
 
@@ -237,13 +240,13 @@ export default function ProductConfigurator() {
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
                 <Link
-                  href="/signin?redirect=/products/fridge-magnets"
+                  href={`/signin?redirect=${PRODUCT_PATH}`}
                   className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-5 py-2 text-sm font-semibold text-white"
                 >
                   Sign in
                 </Link>
                 <Link
-                  href="/signup?redirect=/products/fridge-magnets"
+                  href={`/signup?redirect=${PRODUCT_PATH}`}
                   className="rounded-full border border-slate-700 bg-slate-900 px-5 py-2 text-sm font-semibold text-slate-200"
                 >
                   Create account
@@ -308,6 +311,31 @@ export default function ProductConfigurator() {
                 onChange={handleFiles}
                 className="hidden"
               />
+
+              {!loading && !user && needsLogin && (
+                <div className="mt-3 flex flex-col gap-3 rounded-xl border border-amber-500/50 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-amber-200">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                      <path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    Please sign in first to upload your photos.
+                  </p>
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/signin?redirect=${PRODUCT_PATH}`}
+                      className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-2 text-xs font-semibold text-white"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href={`/signup?redirect=${PRODUCT_PATH}`}
+                      className="rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-xs font-semibold text-slate-200"
+                    >
+                      Create account
+                    </Link>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {Array.from({ length: quantity }).map((_, i) => {
