@@ -13,6 +13,7 @@ type Order = {
   quantity: number;
   unitLabel: string;
   amount: number;
+  total?: number;
   images: string[];
   status: string;
   paymentStatus: string;
@@ -26,11 +27,11 @@ type Order = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-500/15 text-amber-300",
-  processing: "bg-sky-500/15 text-sky-300",
-  shipped: "bg-indigo-500/15 text-indigo-300",
-  delivered: "bg-emerald-500/15 text-emerald-300",
-  cancelled: "bg-rose-500/15 text-rose-300",
+  pending: "bg-gold/20 text-terracotta-dark",
+  processing: "bg-sky-100 text-sky-700",
+  shipped: "bg-indigo-100 text-indigo-700",
+  delivered: "bg-emerald-100 text-emerald-700",
+  cancelled: "bg-red-100 text-red-600",
 };
 
 export default function OrdersClient() {
@@ -38,7 +39,6 @@ export default function OrdersClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const showSuccess = searchParams.get("success") === "1";
-
   const showUpdated = searchParams.get("updated") === "1";
 
   const [orders, setOrders] = useState<Order[]>([]);
@@ -76,47 +76,47 @@ export default function OrdersClient() {
   }
 
   if (authLoading || loading) {
-    return <div className="py-24 text-center text-slate-500">Loading your orders...</div>;
+    return <div className="py-24 text-center text-muted">Loading your orders...</div>;
   }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
       {showSuccess && (
-        <div className="mb-8 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-5">
-          <p className="font-semibold text-emerald-300">Order placed successfully! {"\uD83C\uDF89"}</p>
-          <p className="mt-1 text-sm text-emerald-200/80">
+        <div className="mb-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+          <p className="font-semibold text-emerald-700">Order placed successfully! {"\uD83C\uDF89"}</p>
+          <p className="mt-1 text-sm text-emerald-600">
             We&apos;ve received your order and will confirm the details by phone shortly.
           </p>
         </div>
       )}
 
       {showUpdated && (
-        <div className="mb-8 rounded-2xl border border-blue-500/40 bg-blue-500/10 p-5">
-          <p className="font-semibold text-blue-300">Order updated successfully!</p>
-          <p className="mt-1 text-sm text-blue-200/80">Your changes have been saved.</p>
+        <div className="mb-8 rounded-2xl border border-line bg-gold/15 p-5">
+          <p className="font-semibold text-terracotta-dark">Order updated successfully!</p>
+          <p className="mt-1 text-sm text-muted">Your changes have been saved.</p>
         </div>
       )}
 
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">My Orders</h1>
+        <h1 className="text-3xl font-bold text-charcoal">My Orders</h1>
         <Link
           href="/products/custom-magnets"
-          className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white"
+          className="rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-terracotta-dark"
         >
           New order
         </Link>
       </div>
 
       {orders.length === 0 ? (
-        <div className="mt-12 rounded-3xl border border-slate-800 bg-slate-900/60 p-12 text-center backdrop-blur-sm">
+        <div className="mt-12 rounded-3xl border border-line bg-white p-12 text-center shadow-sm">
           <div className="text-5xl">{"\uD83E\uDDF2"}</div>
-          <p className="mt-4 text-lg font-semibold text-white">No orders yet</p>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-4 text-lg font-semibold text-charcoal">No orders yet</p>
+          <p className="mt-1 text-sm text-muted">
             Upload your photos and create your first custom magnet.
           </p>
           <Link
             href="/products/custom-magnets"
-            className="mt-6 inline-block rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white"
+            className="mt-6 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-terracotta-dark"
           >
             Start creating
           </Link>
@@ -128,36 +128,36 @@ export default function OrdersClient() {
             return (
               <div
                 key={order._id}
-                className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 backdrop-blur-sm sm:flex-row sm:items-center"
+                className="flex flex-col gap-4 rounded-2xl border border-line bg-white p-4 shadow-sm sm:flex-row sm:items-center"
               >
                 <div className="flex -space-x-3">
                   {images.slice(0, 3).map((url, i) => (
                     <div
                       key={i}
-                      className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 border-slate-900 ring-1 ring-slate-700"
+                      className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 border-white ring-1 ring-line"
                       style={{ zIndex: 3 - i }}
                     >
                       <Image src={url} alt={`${order.product} ${i + 1}`} fill className="object-cover" sizes="80px" />
                     </div>
                   ))}
                   {images.length > 3 && (
-                    <div className="grid h-20 w-20 shrink-0 place-items-center rounded-xl border-2 border-slate-900 bg-slate-800 text-sm font-semibold text-slate-200 ring-1 ring-slate-700">
+                    <div className="grid h-20 w-20 shrink-0 place-items-center rounded-xl border-2 border-white bg-cream text-sm font-semibold text-charcoal ring-1 ring-line">
                       +{images.length - 3}
                     </div>
                   )}
                 </div>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="font-semibold text-white">{order.product}</h2>
+                    <h2 className="font-semibold text-charcoal">{order.product}</h2>
                     <span
                       className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
-                        STATUS_STYLES[order.status] ?? "bg-slate-700 text-slate-200"
+                        STATUS_STYLES[order.status] ?? "bg-cream text-charcoal"
                       }`}
                     >
                       {order.status}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm text-slate-400">
+                  <p className="mt-1 text-sm text-muted">
                     {order.unitLabel} &bull; Ordered{" "}
                     {new Date(order.createdAt).toLocaleDateString("en-IN", {
                       day: "numeric",
@@ -165,31 +165,31 @@ export default function OrdersClient() {
                       year: "numeric",
                     })}
                   </p>
-                  <p className="mt-0.5 text-sm text-slate-400">
+                  <p className="mt-0.5 text-sm text-muted">
                     Ship to: {order.shippingAddress.fullName}, {order.shippingAddress.city},{" "}
                     {order.shippingAddress.state} - {order.shippingAddress.pincode}
                   </p>
                 </div>
                 <div className="flex flex-row items-center justify-between gap-4 sm:flex-col sm:items-end">
                   <div className="text-right">
-                    <p className="text-xl font-extrabold text-blue-400">
+                    <p className="text-xl font-extrabold text-terracotta">
                       {CURRENCY_SYMBOL}
-                      {order.amount}
+                      {order.total ?? order.amount}
                     </p>
-                    <p className="text-xs capitalize text-slate-500">{order.paymentStatus}</p>
+                    <p className="text-xs capitalize text-muted">{order.paymentStatus}</p>
                   </div>
                   {order.status === "pending" && (
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/orders/${order._id}/edit`}
-                        className="rounded-full border border-slate-700 bg-slate-900 px-4 py-1.5 text-xs font-semibold text-slate-200 transition-colors hover:bg-slate-800"
+                        className="rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold text-charcoal transition-colors hover:bg-cream"
                       >
                         Edit
                       </Link>
                       <button
                         onClick={() => handleCancel(order._id)}
                         disabled={cancellingId === order._id}
-                        className="rounded-full border border-rose-500/40 bg-rose-500/10 px-4 py-1.5 text-xs font-semibold text-rose-300 transition-colors hover:bg-rose-500/20 disabled:opacity-50"
+                        className="rounded-full border border-red-200 bg-red-50 px-4 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100 disabled:opacity-50"
                       >
                         {cancellingId === order._id ? "Cancelling..." : "Cancel"}
                       </button>

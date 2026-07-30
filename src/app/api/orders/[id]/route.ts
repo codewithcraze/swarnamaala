@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Order } from "@/models/Order";
 import { getSessionUser } from "@/lib/auth";
-import { getTier, isValidOrderPricing } from "@/lib/pricing";
+import { computePricing, quantityLabel, referralReward } from "@/lib/pricing";
 import { isValidUploadUrl } from "@/lib/s3";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -55,22 +55,18 @@ export async function PATCH(request: Request, { params }: Ctx) {
     const note = String(body.note ?? "").trim();
     const address = body.shippingAddress ?? {};
 
-    const tier = getTier(quantity);
-    if (!tier) {
-      return NextResponse.json({ error: "Please choose a valid quantity." }, { status: 400 });
+    const pricing = computePricing(quantity);
+    if (!pricing) {
+      return NextResponse.json(
+        { error: "Please choose a valid quantity (1, 3, 6, 10 or more)." },
+        { status: 400 }
+      );
     }
 
-    const amount = tier.price;
-    if (typeof body.amount !== "undefined" && !isValidOrderPricing(quantity, Number(body.amount))) {
-      return NextResponse.json({ error: "Pricing mismatch detected." }, { status: 400 });
-    }
-
-    if (images.length !== tier.quantity) {
+    if (images.length !== quantity) {
       return NextResponse.json(
         {
-          error: `Please add ${tier.quantity} ${
-            tier.quantity === 1 ? "photo" : "photos"
-          } for your ${tier.label}.`,
+          error: `Please add ${quantity} ${quantity === 1 ? "photo" : "photos"} for your order.`,
         },
         { status: 400 }
       );
@@ -109,12 +105,19 @@ export async function PATCH(request: Request, { params }: Ctx) {
       );
     }
 
+    // Recompute the potential referral reward against the new total.
+    const reward = order.referrer ? referralReward(pricing.total) : 0;
+
     order.set({
-      quantity: tier.quantity,
-      unitLabel: tier.label,
-      amount,
+      quantity,
+      unitLabel: quantityLabel(quantity),
+      subtotal: pricing.subtotal,
+      gst: pricing.gst,
+      total: pricing.total,
+      amount: pricing.total,
       images,
       note,
+      referralReward: reward,
       shippingAddress: {
         fullName: String(address.fullName).trim(),
         phone: String(address.phone).trim(),
@@ -127,7 +130,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
     });
     await order.save();
 
-    return NextResponse.json({ order: { id: order._id.toString(), amount, quantity: tier.quantity } });
+    return NextResponse.json({ order: { id: order._id.toString(), total: pricing.total, quantity } });
   } catch (err) {
     console.error("order PATCH error", err);
     return NextResponse.json({ error: "Failed to update order. Please try again." }, { status: 500 });

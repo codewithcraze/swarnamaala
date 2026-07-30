@@ -25,6 +25,7 @@ type AuthContextValue = {
     email: string;
     phone?: string;
     password: string;
+    ref?: string;
   }) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -64,7 +65,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const register = useCallback(
-    async (payload: { name: string; email: string; phone?: string; password: string }) => {
+    async (payload: {
+      name: string;
+      email: string;
+      phone?: string;
+      password: string;
+      ref?: string;
+    }) => {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

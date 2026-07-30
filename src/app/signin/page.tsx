@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function SignInPage() {
   return (
-    <Suspense fallback={<div className="py-20 text-center text-slate-500">Loading...</div>}>
+    <Suspense fallback={<div className="py-20 text-center text-muted">Loading...</div>}>
       <SignInForm />
     </Suspense>
   );

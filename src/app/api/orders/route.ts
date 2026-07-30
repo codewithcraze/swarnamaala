@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Order } from "@/models/Order";
+import { User } from "@/models/User";
 import { getSessionUser } from "@/lib/auth";
-import { getTier, isValidOrderPricing, CURRENCY } from "@/lib/pricing";
+import { computePricing, quantityLabel, referralReward, CURRENCY } from "@/lib/pricing";
 import { isValidUploadUrl } from "@/lib/s3";
 
 export async function GET() {
@@ -39,24 +40,20 @@ export async function POST(request: Request) {
     const note = String(body.note ?? "").trim();
     const address = body.shippingAddress ?? {};
 
-    const tier = getTier(quantity);
-    if (!tier) {
-      return NextResponse.json({ error: "Please choose a valid quantity." }, { status: 400 });
-    }
-
     // Always compute price from the server-side pricing table.
-    const amount = tier.price;
-    if (typeof body.amount !== "undefined" && !isValidOrderPricing(quantity, Number(body.amount))) {
-      return NextResponse.json({ error: "Pricing mismatch detected." }, { status: 400 });
+    const pricing = computePricing(quantity);
+    if (!pricing) {
+      return NextResponse.json(
+        { error: "Please choose a valid quantity (1, 3, 6, 10 or more)." },
+        { status: 400 }
+      );
     }
 
-    // One image per magnet: the number of photos must match the pack size.
-    if (images.length !== tier.quantity) {
+    // One image per magnet: the number of photos must match the quantity.
+    if (images.length !== quantity) {
       return NextResponse.json(
         {
-          error: `Please add ${tier.quantity} ${
-            tier.quantity === 1 ? "photo" : "photos"
-          } for your ${tier.label}.`,
+          error: `Please add ${quantity} ${quantity === 1 ? "photo" : "photos"} for your order.`,
         },
         { status: 400 }
       );
@@ -84,12 +81,22 @@ export async function POST(request: Request) {
     }
 
     await connectToDatabase();
+
+    // Referral snapshot: if this buyer was referred, record the referrer and
+    // the reward they will earn once this order is delivered.
+    const buyer = await User.findById(session.id).lean<{ referredBy?: unknown }>();
+    const referrer = buyer?.referredBy ?? null;
+    const reward = referrer ? referralReward(pricing.total) : 0;
+
     const order = await Order.create({
       user: session.id,
       product: "Custom Photo Magnet",
-      quantity: tier.quantity,
-      unitLabel: tier.label,
-      amount,
+      quantity,
+      unitLabel: quantityLabel(quantity),
+      subtotal: pricing.subtotal,
+      gst: pricing.gst,
+      total: pricing.total,
+      amount: pricing.total,
       currency: CURRENCY,
       images,
       note,
@@ -102,9 +109,14 @@ export async function POST(request: Request) {
         state: String(address.state).trim(),
         pincode: String(address.pincode).trim(),
       },
+      referrer,
+      referralReward: reward,
+      referralCredited: false,
     });
 
-    return NextResponse.json({ order: { id: order._id.toString(), amount, quantity: tier.quantity } });
+    return NextResponse.json({
+      order: { id: order._id.toString(), total: pricing.total, quantity },
+    });
   } catch (err) {
     console.error("orders POST error", err);
     return NextResponse.json({ error: "Failed to place order. Please try again." }, { status: 500 });

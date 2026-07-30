@@ -10,6 +10,7 @@ export default function SignUpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/products/custom-magnets";
+  const ref = (searchParams.get("ref") || "").trim().toUpperCase();
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
   const [error, setError] = useState("");
@@ -24,7 +25,7 @@ export default function SignUpForm() {
     setError("");
     setLoading(true);
     try {
-      await register(form);
+      await register({ ...form, ref: ref || undefined });
       router.push(redirect);
       router.refresh();
     } catch (err) {
@@ -36,15 +37,22 @@ export default function SignUpForm() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12">
-      <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 backdrop-blur-sm">
-        <h1 className="text-2xl font-bold text-white">Create your account</h1>
-        <p className="mt-1 text-sm text-slate-400">
+      <div className="rounded-3xl border border-line bg-white p-8 shadow-sm">
+        <h1 className="text-2xl font-bold text-charcoal">Create your account</h1>
+        <p className="mt-1 text-sm text-muted">
           Sign up to upload photos and order your magnets.
         </p>
 
+        {ref && (
+          <p className="mt-4 rounded-lg bg-gold/15 px-4 py-2.5 text-sm text-terracotta-dark">
+            🎁 You were invited with code <span className="font-semibold">{ref}</span> — your
+            friend earns a reward when your order is delivered.
+          </p>
+        )}
+
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-slate-400">Full name</span>
+            <span className="mb-1 block text-xs font-medium text-muted">Full name</span>
             <input
               required
               value={form.name}
@@ -54,7 +62,7 @@ export default function SignUpForm() {
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-slate-400">Email</span>
+            <span className="mb-1 block text-xs font-medium text-muted">Email</span>
             <input
               type="email"
               required
@@ -65,9 +73,7 @@ export default function SignUpForm() {
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-slate-400">
-              Phone (optional)
-            </span>
+            <span className="mb-1 block text-xs font-medium text-muted">Phone (optional)</span>
             <input
               value={form.phone}
               onChange={(e) => update("phone", e.target.value)}
@@ -77,7 +83,7 @@ export default function SignUpForm() {
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-slate-400">Password</span>
+            <span className="mb-1 block text-xs font-medium text-muted">Password</span>
             <input
               type="password"
               required
@@ -90,23 +96,23 @@ export default function SignUpForm() {
           </label>
 
           {error && (
-            <p className="rounded-lg bg-rose-500/15 px-4 py-2.5 text-sm text-rose-300">{error}</p>
+            <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-transform hover:scale-[1.01] disabled:opacity-60"
+            className="w-full rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60"
           >
             {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-400">
+        <p className="mt-6 text-center text-sm text-muted">
           Already have an account?{" "}
           <Link
             href={`/signin?redirect=${encodeURIComponent(redirect)}`}
-            className="font-semibold text-blue-400 hover:text-blue-300"
+            className="font-semibold text-terracotta hover:text-terracotta-dark"
           >
             Sign in
           </Link>

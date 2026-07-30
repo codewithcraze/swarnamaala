@@ -13,6 +13,12 @@ const UserSchema = new Schema(
     },
     phone: { type: String, trim: true },
     passwordHash: { type: String, required: true },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
+
+    // Referral program.
+    referralCode: { type: String, unique: true, index: true, sparse: true },
+    referredBy: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
+    walletBalance: { type: Number, default: 0 }, // total referral earnings (INR)
   },
   { timestamps: true }
 );

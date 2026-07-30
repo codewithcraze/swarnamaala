@@ -15,7 +15,7 @@ export default async function EditOrderPage({
 }) {
   const { id } = await params;
   return (
-    <Suspense fallback={<div className="py-24 text-center text-slate-500">Loading...</div>}>
+    <Suspense fallback={<div className="py-24 text-center text-muted">Loading...</div>}>
       <EditOrderClient orderId={id} />
     </Suspense>
   );

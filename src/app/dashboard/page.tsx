@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import OrdersClient from "./OrdersClient";
+import DashboardClient from "./DashboardClient";
 
 export const metadata: Metadata = {
-  title: "My Orders",
-  description: "View and track your custom photo magnet orders.",
+  title: "Refer & Earn",
+  description: "Your referral dashboard — share your link and track your earnings.",
   robots: { index: false, follow: false },
 };
 
-export default function OrdersPage() {
+export default function DashboardPage() {
   return (
     <Suspense fallback={<div className="py-24 text-center text-muted">Loading...</div>}>
-      <OrdersClient />
+      <DashboardClient />
     </Suspense>
   );
 }

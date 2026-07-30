@@ -33,13 +33,13 @@ export default function SignInForm() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12">
-      <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 backdrop-blur-sm">
-        <h1 className="text-2xl font-bold text-white">Welcome back</h1>
-        <p className="mt-1 text-sm text-slate-400">Sign in to place your order.</p>
+      <div className="rounded-3xl border border-line bg-white p-8 shadow-sm">
+        <h1 className="text-2xl font-bold text-charcoal">Welcome back</h1>
+        <p className="mt-1 text-sm text-muted">Sign in to place your order.</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-slate-400">Email</span>
+            <span className="mb-1 block text-xs font-medium text-muted">Email</span>
             <input
               type="email"
               required
@@ -50,7 +50,7 @@ export default function SignInForm() {
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-slate-400">Password</span>
+            <span className="mb-1 block text-xs font-medium text-muted">Password</span>
             <input
               type="password"
               required
@@ -62,23 +62,23 @@ export default function SignInForm() {
           </label>
 
           {error && (
-            <p className="rounded-lg bg-rose-500/15 px-4 py-2.5 text-sm text-rose-300">{error}</p>
+            <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-transform hover:scale-[1.01] disabled:opacity-60"
+            className="w-full rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-400">
+        <p className="mt-6 text-center text-sm text-muted">
           New here?{" "}
           <Link
             href={`/signup?redirect=${encodeURIComponent(redirect)}`}
-            className="font-semibold text-blue-400 hover:text-blue-300"
+            className="font-semibold text-terracotta hover:text-terracotta-dark"
           >
             Create an account
           </Link>

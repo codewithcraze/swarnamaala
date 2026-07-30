@@ -9,7 +9,7 @@ function Stars({ rating }: { rating: number }) {
           width="16"
           height="16"
           viewBox="0 0 24 24"
-          className={i < rating ? "text-amber-400" : "text-slate-700"}
+          className={i < rating ? "text-gold" : "text-line"}
           fill="currentColor"
         >
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z" />
@@ -44,16 +44,16 @@ function PinIcon() {
 
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <figure className="flex h-full flex-col rounded-2xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-sm transition-colors hover:border-blue-500/40">
+    <figure className="flex h-full flex-col rounded-2xl border border-line bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-center gap-3">
-        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-semibold text-white">
+        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-terracotta to-terracotta-dark text-sm font-semibold text-white">
           {initials(review.name)}
         </div>
         <div className="min-w-0">
-          <figcaption className="truncate font-medium text-slate-100">
+          <figcaption className="truncate font-medium text-charcoal">
             {review.name}
           </figcaption>
-          <p className="flex items-center gap-1 text-xs text-blue-300/80">
+          <p className="flex items-center gap-1 text-xs text-terracotta">
             <PinIcon />
             {review.location}
           </p>
@@ -62,7 +62,7 @@ function ReviewCard({ review }: { review: Review }) {
       <div className="mt-3">
         <Stars rating={review.rating} />
       </div>
-      <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-slate-300">
+      <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-muted">
         &ldquo;{review.text}&rdquo;
       </blockquote>
     </figure>
@@ -73,15 +73,15 @@ export default function Reviews() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-300">
+        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-terracotta">
           Customer reviews
         </span>
-        <h2 className="mt-5 text-3xl font-bold text-white sm:text-4xl">
+        <h2 className="mt-5 text-3xl font-bold text-charcoal sm:text-4xl">
           Loved across Delhi NCR
         </h2>
-        <p className="mt-3 flex items-center justify-center gap-2 text-slate-400">
+        <p className="mt-3 flex items-center justify-center gap-2 text-muted">
           <Stars rating={Math.round(AVERAGE_RATING)} />
-          <span className="font-semibold text-slate-200">{AVERAGE_RATING}</span>
+          <span className="font-semibold text-charcoal">{AVERAGE_RATING}</span>
           <span>from happy customers in Noida, Delhi &amp; Gurugram</span>
         </p>
       </div>

@@ -24,8 +24,15 @@ const OrderSchema = new Schema(
     product: { type: String, required: true, default: "Custom Photo Magnet" },
     quantity: { type: Number, required: true, min: 1 },
     unitLabel: { type: String, required: true },
+
+    // Pricing breakdown (all in INR).
+    subtotal: { type: Number, required: true, min: 0 },
+    gst: { type: Number, required: true, min: 0 },
+    total: { type: Number, required: true, min: 0 },
+    // Kept as an alias of total for backward compatibility.
     amount: { type: Number, required: true, min: 0 },
     currency: { type: String, required: true, default: "INR" },
+
     images: {
       type: [String],
       required: true,
@@ -46,6 +53,12 @@ const OrderSchema = new Schema(
       enum: ["unpaid", "paid", "refunded"],
       default: "unpaid",
     },
+
+    // Referral tracking: who referred the buyer, the reward they earn, and
+    // whether it has been credited (credited once the order is delivered).
+    referrer: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
+    referralReward: { type: Number, default: 0 },
+    referralCredited: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
