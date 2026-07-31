@@ -30,7 +30,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-line bg-cream/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-t border-[#340d00] border-line bg-cream/85 backdrop-blur-md">
         <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Logo onClick={() => setOpen(false)} priority />
 

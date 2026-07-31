@@ -41,10 +41,10 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 md:grid-cols-2 md:py-20">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-terracotta">
-              <span className="h-1.5 w-1.5 rounded-full bg-terracotta" />
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-10 sm:px-6 md:grid-cols-2 py-10">
+          <div style={{height: "stretch"}} >
+            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#340d00]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#340d00]" />
               Premium custom photo magnets
             </span>
             <h1 className="mt-5 text-4xl font-extrabold leading-tight text-charcoal sm:text-5xl lg:text-6xl">
@@ -61,7 +61,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/products/custom-magnets"
-                className="rounded-full bg-terracotta px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-terracotta/25 transition-colors hover:bg-terracotta-dark"
+                className="rounded-full bg-[#340d00] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-terracotta/25 transition-colors hover:bg-terracotta-dark"
               >
                 Create your magnets
               </Link>
@@ -98,10 +98,10 @@ export default function HomePage() {
       </section>
 
       {/* Same-day delivery strip */}
-      <section className="bg-terracotta">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-4 py-3 text-center text-sm font-medium text-white sm:flex-row sm:gap-6 sm:px-6">
+      <section className="bg-[#340d00]">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-4 py-8 text-center text-lg font-medium text-white sm:flex-row sm:gap-6 sm:px-6">
           <span className="flex items-center gap-2">
-            🛵 Same-day delivery in Noida, Delhi &amp; Ghaziabad
+            Same-day delivery in Noida, Delhi &amp; Ghaziabad
           </span>
           <span className="hidden h-4 w-px bg-white/30 sm:block" />
           <span>Or within 24–48 hours max, right to your doorstep</span>
