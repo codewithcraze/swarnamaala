@@ -13,14 +13,14 @@ export const REVIEWS: Review[] = [
     location: "Sector 62, Noida",
     rating: 5,
     text: "Picture are so good. I asked them to create with different shapes and with resin work. Product deliverd is also good.",
-    image: "/uploads/customer3.jpeg"
+    image: "/feedback/customer3.jpeg"
   },
   {
     name: "Priya S",
     location: "Mumbai",
     rating: 5,
     text: "The print quality blew me away — colors are exactly like the original photo. Fridge looks so much happier now!",
-    image: "/uploads/customer.png"
+    image: "/feedback/customer.png"
   },
   {
     name: "Priya Malhotra",

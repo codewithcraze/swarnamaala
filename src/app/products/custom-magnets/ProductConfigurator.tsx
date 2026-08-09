@@ -544,7 +544,7 @@ const CUSTOMER_REVIEWS = [
     location: "Noida",
     rating: 5,
     text: "Picture are so good. I asked them to create with different shapes and with resin work. Product deliverd is also good.",
-    photo: "/uploads/customer3.jpeg",
+    photo: "/feedback/customer3.jpeg",
     verified: true,
   },
   {
@@ -552,7 +552,7 @@ const CUSTOMER_REVIEWS = [
     location: "Mumbai",
     rating: 5,
     text: "The print quality blew me away — colors are exactly like the original photo. Fridge looks so much happier now!",
-    photo: "/uploads/customer.png",
+    photo: "/feedback/customer.png",
     verified: true,
   },
   {
@@ -560,7 +560,7 @@ const CUSTOMER_REVIEWS = [
     location: "Bengaluru",
     rating: 5,
     text: "Ordered a 9-pack for my parents' anniversary. Packaging was solid and delivery was faster than expected.",
-    photo: "/uploads/customer2.png",
+    photo: "/feedback/customer2.png",
     verified: true,
   },
    
