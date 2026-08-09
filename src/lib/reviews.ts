@@ -3,45 +3,52 @@ export type Review = {
   location: string;
   rating: number;
   text: string;
+  image: string;
 };
 
 // Sample customer reviews from the Delhi NCR region.
 export const REVIEWS: Review[] = [
   {
-    name: "Ananya Sharma",
+    name: "Deepak Chaudhary",
     location: "Sector 62, Noida",
     rating: 5,
-    text: "The quality blew me away. My wedding photos look stunning as magnets and the colours are so rich. Delivered to Noida in just 3 days!",
+    text: "Picture are so good. I asked them to create with different shapes and with resin work. Product deliverd is also good.",
+    image: "/uploads/customer3.jpeg"
   },
   {
-    name: "Rahul Verma",
-    location: "Connaught Place, Delhi",
+    name: "Priya S",
+    location: "Mumbai",
     rating: 5,
-    text: "Ordered the pack of 10 for return gifts. Everyone loved them. Packaging was premium and delivery across Delhi was super quick.",
+    text: "The print quality blew me away — colors are exactly like the original photo. Fridge looks so much happier now!",
+    image: "/uploads/customer.png"
   },
   {
     name: "Priya Malhotra",
     location: "DLF Phase 3, Gurugram",
     rating: 5,
     text: "I uploaded 3 different travel photos and each magnet came out perfect. Being able to preview before ordering is such a nice touch.",
+    image: ""
   },
   {
     name: "Kabir Singh",
     location: "Rajouri Garden, Delhi",
     rating: 4,
     text: "Great value for money. The magnets are strong and hold well. Will definitely order again for my parents in Delhi.",
+    image: ""
   },
   {
     name: "Sneha Gupta",
     location: "Sector 18, Noida",
     rating: 5,
     text: "Used the same baby photo for all 6 magnets and gifted them to family. The finish is glossy and looks really premium.",
+    image: ""
   },
   {
     name: "Aditya Rao",
     location: "Cyber City, Gurugram",
     rating: 5,
     text: "Fast, easy and beautiful. Uploaded from my phone, ordered in two minutes, and got them delivered to Gurugram within the week.",
+    image: ""
   },
 ];
 

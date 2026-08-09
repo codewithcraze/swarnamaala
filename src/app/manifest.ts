@@ -8,13 +8,19 @@ export default function manifest(): MetadataRoute.Manifest {
       "Create premium personalised custom photo magnets online and get them delivered across India.",
     start_url: "/",
     display: "standalone",
-    background_color: "#fffdf8",
-    theme_color: "#c68b2b",
+    background_color: "#fff8f2",
+    theme_color: "#d97757",
     icons: [
+      {
+        src: "/favicon.ico",
+        sizes: "48x48",
+        type: "image/x-icon",
+      },
       {
         src: "/icon.svg",
         sizes: "any",
         type: "image/svg+xml",
+        purpose: "maskable",
       },
     ],
   };

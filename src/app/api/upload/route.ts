@@ -8,9 +8,8 @@ import { s3Configured, uploadToS3 } from "@/lib/s3";
 // mongoose / aws-sdk need the Node.js runtime (not edge), and image uploads
 // can take a little longer than the default limit.
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 120; // large images can take time
 
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED = new Map<string, string>([
   ["image/jpeg", "jpg"],
   ["image/png", "png"],
@@ -38,13 +37,6 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Unsupported file type. Please upload a JPG, PNG or WebP image." },
         { status: 415 }
-      );
-    }
-
-    if (file.size > MAX_SIZE) {
-      return NextResponse.json(
-        { error: "Image is too large. Maximum size is 10 MB." },
-        { status: 413 }
       );
     }
 

@@ -4,11 +4,7 @@ import { PRICING_TIERS, CURRENCY_SYMBOL, EXTRA_MAGNET_PRICE } from "@/lib/pricin
 import { REVIEWS, AVERAGE_RATING } from "@/lib/reviews";
 import Reviews from "@/components/Reviews";
 
-const REFERRAL_TIERS = [
-  { order: 399, reward: 29, tone: "bg-gold/15 text-terracotta-dark" },
-  { order: 499, reward: 39, tone: "bg-terracotta/15 text-terracotta-dark" },
-  { order: 699, reward: 49, tone: "bg-[#e7f0e0] text-[#4a6b39]" },
-];
+import {HighQualityPrint, StrongMagnetIcon, Packageing, Fire, BestPrice, First, Second} from '@/components/svg';
 
 export default function HomePage() {
   const productJsonLd = {
@@ -39,10 +35,11 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
 
+
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-10 sm:px-6 md:grid-cols-2 py-10">
-          <div style={{height: "stretch"}} >
+          <div style={{ height: "stretch" }} >
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#340d00]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#340d00]" />
               Premium custom photo magnets
@@ -103,10 +100,13 @@ export default function HomePage() {
           <span className="flex items-center gap-2">
             Same-day delivery in Noida, Delhi &amp; Ghaziabad
           </span>
-          <span className="hidden h-4 w-px bg-white/30 sm:block" />
-          <span>Or within 24–48 hours max, right to your doorstep</span>
+          <span>Or within 24-48 hours max, right to your doorstep</span>
         </div>
       </section>
+      {/* Full-width banner carousel — shown before the hero */}
+
+
+
 
       {/* Trust bar */}
       <section className="border-b border-line">
@@ -124,6 +124,7 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+   
 
       {/* How it works */}
       <section id="how-it-works" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-20 sm:px-6">
@@ -162,93 +163,221 @@ export default function HomePage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="scroll-mt-20 py-20">
+      <section id="pricing" className="scroll-mt-20 py-20 bg-cream">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          {/* Header */}
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold text-charcoal sm:text-4xl">Simple, honest pricing</h2>
+            <span className="inline-block rounded-full border border-terracotta/30 bg-terracotta/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-terracotta">
+              Transparent Pricing
+            </span>
+            <h2 className="mt-4 text-3xl font-extrabold text-charcoal sm:text-4xl">
+              Simple, honest pricing
+            </h2>
             <p className="mt-3 text-muted">The more you order, the more you save per magnet.</p>
           </div>
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {PRICING_TIERS.map((tier) => (
-              <div
-                key={tier.quantity}
-                className={`relative rounded-2xl border bg-white p-6 text-center shadow-sm transition-transform hover:-translate-y-1 ${
-                  tier.badge === "Best Value" ? "border-terracotta ring-2 ring-terracotta/30" : "border-line"
-                }`}
-              >
-                {tier.badge && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-terracotta px-3 py-1 text-xs font-semibold text-white">
-                    {tier.badge}
-                  </span>
-                )}
-                <p className="text-lg font-semibold text-charcoal">{tier.label}</p>
-                <p className="mt-4 text-4xl font-extrabold text-terracotta">
-                  {CURRENCY_SYMBOL}
-                  {tier.price}
-                </p>
-                <p className="mt-1 text-sm text-muted">
-                  {CURRENCY_SYMBOL}
-                  {tier.perPiece} per magnet
-                </p>
-                <p className="mt-0.5 text-xs text-muted">+ 18% GST</p>
-                <Link
-                  href={`/products/custom-magnets?qty=${tier.quantity}`}
-                  className="mt-6 block rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-terracotta-dark"
+
+          {/* Cards */}
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {PRICING_TIERS.map((tier) => {
+              const isFeatured = tier.badge === "Best Value";
+              const isPopular = tier.badge === "Popular";
+              return (
+                <div
+                  key={tier.quantity}
+                  className={`group relative flex flex-col overflow-hidden rounded-3xl border transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${
+                    isFeatured
+                      ? "border-terracotta bg-gradient-to-b from-terracotta to-terracotta-dark text-white shadow-lg shadow-terracotta/30"
+                      : isPopular
+                        ? "border-gold bg-white shadow-md"
+                        : "border-line bg-white shadow-sm"
+                  }`}
                 >
-                  Choose pack
-                </Link>
-              </div>
-            ))}
+                  {/* Badge */}
+                  {tier.badge && (
+                    <div className={`flex items-center justify-center gap-1.5 py-2 text-xs font-bold uppercase tracking-widest ${
+                      isFeatured ? "bg-terracotta-dark/40 text-white" : "bg-gold text-white"
+                    }`}>
+                      {isFeatured ? <BestPrice /> : <Fire />}{tier.badge}
+                    </div>
+                  )}
+
+                  <div className="flex flex-1 flex-col p-6 text-center">
+                    {/* Magnet count */}
+                    <div className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl font-extrabold ${
+                      isFeatured ? "bg-white/20 text-white" : "bg-terracotta/10 text-terracotta"
+                    }`}>
+                      {tier.quantity}
+                    </div>
+
+                    <p className={`text-base font-semibold ${isFeatured ? "text-white" : "text-charcoal"}`}>
+                      {tier.label}
+                    </p>
+
+                    {/* Price */}
+                    <div className="my-5">
+                      <div className={`text-5xl font-extrabold leading-none ${isFeatured ? "text-white" : "text-terracotta"}`}>
+                        {CURRENCY_SYMBOL}{tier.price}
+                      </div>
+                      <p className={`mt-2 text-sm ${isFeatured ? "text-white/80" : "text-muted"}`}>
+                        {CURRENCY_SYMBOL}{tier.perPiece} per magnet
+                      </p>
+                      <p className={`text-xs ${isFeatured ? "text-white/60" : "text-muted"}`}>
+                        + 18% GST
+                      </p>
+                    </div>
+
+                    {/* Savings pill — only theme colors */}
+                    {tier.quantity > 1 && (
+                      <div className={`mx-auto mb-5 rounded-full px-3 py-1 text-xs font-semibold ${
+                        isFeatured
+                          ? "bg-white/20 text-white"
+                          : "bg-gold/15 text-charcoal"
+                      }`}>
+                        Save {CURRENCY_SYMBOL}{(99 - tier.perPiece) * tier.quantity} vs single
+                      </div>
+                    )}
+
+                    <Link
+                      href={`/products/custom-magnets?qty=${tier.quantity}`}
+                      className={`mt-auto block rounded-full py-3 text-sm font-bold transition-all hover:scale-[1.03] ${
+                        isFeatured
+                          ? "bg-white text-terracotta hover:bg-cream"
+                          : "bg-terracotta text-white hover:bg-terracotta-dark"
+                      }`}
+                    >
+                      Order Now →
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <p className="mt-8 text-center text-sm text-muted">
-            Need more than 10? Add as many as you like — each extra magnet is just{" "}
-            <span className="font-semibold text-charcoal">
-              {CURRENCY_SYMBOL}
-              {EXTRA_MAGNET_PRICE}
-            </span>
-            . All prices exclusive of 18% GST, added at checkout.
-          </p>
+
+          {/* Custom quantity note */}
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-sm">
+              <span className="text-2xl">📦</span>
+              <div>
+                <p className="text-sm font-semibold text-charcoal">Need more than 10 magnets?</p>
+                <p className="text-sm text-muted">
+                  Each extra magnet is just <span className="font-bold text-terracotta">{CURRENCY_SYMBOL}{EXTRA_MAGNET_PRICE}</span>
+                  &nbsp;· All prices excl. 18% GST
+                </p>
+              </div>
+              <Link
+                href="/products/custom-magnets?qty=15"
+                className="shrink-0 rounded-full border border-terracotta px-4 py-2 text-xs font-semibold text-terracotta transition-colors hover:bg-terracotta hover:text-white"
+              >
+                Customise
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Refer & Earn */}
-      <section className="bg-[#fdf1e6] py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <section className="relative overflow-hidden py-8">
+        {/* Background blobs — only theme colors */}
+        <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-terracotta/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-gold/15 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+          {/* Header */}
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold uppercase tracking-wide text-terracotta">
-              Refer, share &amp; earn rewards
-            </span>
-            <h2 className="mt-2 text-3xl font-bold text-charcoal sm:text-4xl">
-              Invite friends, earn on every order
+            <h2 className="mt-5 text-3xl font-extrabold text-charcoal sm:text-4xl lg:text-5xl">
+              Share the love,{" "}
+              <span className="bg-gradient-to-r from-terracotta to-gold bg-clip-text text-transparent">
+                earn real cash
+              </span>
             </h2>
-            <p className="mt-3 text-muted">
-              Share your referral link. When a friend places an order, you earn a reward
-              credited to your wallet once their order is delivered.
+            <p className="mt-4 text-base leading-relaxed text-muted">
+              Invite a friend to order custom magnets. They get beautiful memories — you get{" "}
+              <strong className="text-charcoal">₹29 to ₹49 credited</strong> to your wallet the moment their order is delivered.
             </p>
           </div>
-          <div className="mt-12 grid gap-6 sm:grid-cols-3">
-            {REFERRAL_TIERS.map((t) => (
-              <div key={t.order} className="rounded-2xl border border-line bg-white p-8 text-center shadow-sm">
-                <span className={`inline-block rounded-full px-4 py-1 text-xs font-semibold ${t.tone}`}>
-                  Order worth {CURRENCY_SYMBOL}
-                  {t.order}
-                </span>
-                <p className="mt-4 text-sm font-medium text-muted">Earn</p>
-                <p className="text-4xl font-extrabold text-terracotta">
-                  {CURRENCY_SYMBOL}
-                  {t.reward}
-                </p>
-                <p className="mt-1 text-xs text-muted">per successful order</p>
+
+          {/* Reward tier cards — all theme tokens */}
+          <div className="mt-14 grid gap-5 sm:grid-cols-3">
+            {[
+              {
+                order: 399, reward: 29,
+                icon: "🥉", label: "Starter",
+                bg: "from-cream to-line/40",
+                border: "border-line",
+                badge: "bg-line text-charcoal",
+              },
+              {
+                order: 499, reward: 39,
+                icon: <Second />, label: "Silver",
+                bg: "from-terracotta/8 to-cream",
+                border: "border-terracotta/40",
+                badge: "bg-terracotta/10 text-terracotta-dark",
+              },
+              {
+                order: 699, reward: 49,
+                icon: <First />, label: "Gold",
+                bg: "from-gold/15 to-cream",
+                border: "border-gold/60",
+                badge: "bg-gold/20 text-charcoal",
+              },
+            ].map((t) => (
+              <div
+                key={t.order}
+                className={`group relative overflow-hidden rounded-3xl border-2 bg-gradient-to-br p-7 text-center shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${t.bg} ${t.border}`}
+              >
+                {/* Decorative circles using theme white */}
+                <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/50" />
+                <div className="pointer-events-none absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-white/40" />
+
+                <div className="relative">
+                  <div className="flex justify-center text-5xl">{t.icon}</div>
+                  <p className={`mt-3 inline-block rounded-full px-3 py-1 text-xs font-bold ${t.badge}`}>
+                    {t.label} reward
+                  </p>
+                  <p className="mt-3 text-sm text-muted">
+                    When friend orders{" "}
+                    <span className="font-bold text-charcoal">{CURRENCY_SYMBOL}{t.order}+</span>
+                  </p>
+                  <p className="mt-4 text-sm font-medium text-muted">You earn</p>
+                  <p className="text-5xl font-extrabold text-terracotta">
+                    {CURRENCY_SYMBOL}{t.reward}
+                  </p>
+                  <p className="mt-1 text-xs text-muted">credited after delivery</p>
+                </div>
               </div>
             ))}
           </div>
-          <div className="mt-8 text-center">
-            <Link
-              href="/dashboard"
-              className="inline-block rounded-full bg-charcoal px-8 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-90"
-            >
-              Get your referral link
-            </Link>
+
+          {/* CTA block — uses charcoal→terracotta gradient (all theme) */}
+          <div className="relative mt-14 overflow-hidden rounded-3xl bg-gradient-to-r from-charcoal to-terracotta px-8 py-10 text-center shadow-xl sm:px-16">
+            <div className="pointer-events-none absolute -left-10 -top-10 h-48 w-48 rounded-full bg-white/5 blur-2xl" />
+            <div className="pointer-events-none absolute -bottom-10 -right-10 h-48 w-48 rounded-full bg-gold/10 blur-2xl" />
+            <p className="relative text-sm font-semibold uppercase tracking-widest text-white/60">Ready to earn?</p>
+            <h3 className="relative mt-2 text-2xl font-extrabold text-white sm:text-3xl">
+              Get your referral link in seconds
+            </h3>
+            <p className="relative mx-auto mt-2 max-w-md text-sm text-white/75">
+              No minimum. No expiry. Every referred order earns you cash — forever.
+            </p>
+            <div className="relative mt-6 flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/dashboard"
+                className="rounded-full bg-white px-8 py-3 text-sm font-bold text-terracotta shadow-lg transition-transform hover:scale-[1.04]"
+              >
+                Get my referral link →
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-full border border-white/30 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                Create account first
+              </Link>
+            </div>
+            {/* <div className="relative mt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-white/50">
+              <span>✅ No minimum orders</span>
+              <span>✅ Instant wallet credit</span>
+              <span>✅ Share via WhatsApp</span>
+            </div> */}
           </div>
         </div>
       </section>
@@ -257,9 +386,18 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
         <div className="grid gap-8 md:grid-cols-3">
           {[
-            { icon: "🎨", title: "High quality print", desc: "Vibrant, long-lasting, high-resolution printing that keeps your photos crisp." },
-            { icon: "🧲", title: "Strong magnet", desc: "Durable backing that holds strongly and lasts for years." },
-            { icon: "📦", title: "Safe packaging", desc: "Each order is packed with care so it arrives in perfect shape." },
+            {
+              icon: <HighQualityPrint />
+              , title: "High quality print", desc: "Vibrant, long-lasting, high-resolution printing that keeps your photos crisp."
+            },
+            {
+              icon: <StrongMagnetIcon />
+              , title: "Strong magnet", desc: "Durable backing that holds strongly and lasts for years."
+            },
+            {
+              icon: <Packageing />
+              , title: "Safe packaging", desc: "Each order is packed with care so it arrives in perfect shape."
+            },
           ].map((f) => (
             <div key={f.title} className="rounded-2xl border border-line bg-white p-8 shadow-sm">
               <div className="text-3xl">{f.icon}</div>

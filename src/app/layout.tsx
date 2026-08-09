@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import WhatsAppFAB from "@/components/WhatsAppFAB";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -36,20 +37,31 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  // Favicon configuration — Next.js serves these from /app/icon.svg and
+  // /public/favicon.ico automatically; the icons array below adds explicit
+  // <link> tags so older browsers and crawlers also pick them up.
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48", type: "image/x-icon" },
+      { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: SITE_URL,
     siteName: "swarnamaala.in",
-    title: "Custom Photo Fridge Magnets Online in India | swarnamaala.in",
+    title: "Custom Photo Magnets Online in India | swarnamaala.in",
     description:
-      "Turn your memories into premium custom fridge magnets. Packs from \u20B999. Upload your photos and we deliver across India.",
+      "Turn your memories into premium custom photo magnets. Packs from \u20B999. Upload your photos and we deliver across India.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Custom Photo Fridge Magnets Online | swarnamaala.in",
+    title: "Custom Photo Magnets Online | swarnamaala.in",
     description:
-      "Turn your memories into premium custom fridge magnets. Packs from \u20B999. Delivered across India.",
+      "Turn your memories into premium custom photo magnets. Packs from \u20B999. Delivered across India.",
   },
   robots: {
     index: true,
@@ -73,7 +85,7 @@ export default function RootLayout({
     "@type": "Organization",
     name: "swarnamaala.in",
     url: SITE_URL,
-    logo: `${SITE_URL}/icon.svg`,
+    logo: `${SITE_URL}/logo.png`,
     description: "Custom photo fridge magnets printed and delivered across India.",
     areaServed: "IN",
   };
@@ -89,6 +101,7 @@ export default function RootLayout({
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <Footer />
+          <WhatsAppFAB />
         </AuthProvider>
       </body>
     </html>
