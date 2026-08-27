@@ -8,6 +8,13 @@ export type Review = {
 
 // Sample customer reviews from the Delhi NCR region.
 export const REVIEWS: Review[] = [
+   {
+    name: "Priyanka Thakur",
+    location: "Greater Noida",
+    rating: 5,
+    text: "Very nice, Print Quality is good.",
+    image: "/feedback/customer4.jpeg"
+  },
   {
     name: "Deepak Chaudhary",
     location: "Sector 62, Noida",

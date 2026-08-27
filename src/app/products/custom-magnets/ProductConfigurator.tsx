@@ -7,10 +7,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import BannerCarousel from "@/components/BannerCarousel";
+import { openRazorpayCheckout } from "@/lib/razorpay";
 import {
   PRICING_TIERS, getTier, computePricing, quantityLabel,
-  CURRENCY_SYMBOL, EXTRA_MAGNET_PRICE, MAX_QUANTITY, GST_RATE,
+  CURRENCY_SYMBOL, EXTRA_MAGNET_PRICE, MAX_QUANTITY, COD_FEE,
 } from "@/lib/pricing";
+
+type PaymentMethod = "online" | "cod";
 
 const PRODUCT_PATH = "/products/custom-magnets";
 
@@ -24,7 +27,8 @@ const EMPTY_ADDRESS: Address = {
 const STEPS = [
   { id: 1 as const, label: "Choose Pack" },
   { id: 2 as const, label: "Upload Photos" },
-  { id: 3 as const, label: "Shipping & Pay" },
+  { id: 3 as const, label: "Shipping" },
+  { id: 4 as const, label: "Payment" },
 ];
 
 export default function ProductConfigurator() {
@@ -45,7 +49,14 @@ export default function ProductConfigurator() {
   const [error, setError] = useState("");
   const [needsLogin, setNeedsLogin] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<
+    { code: string; discount: number; finalTotal: number } | null
+  >(null);
+  const [couponError, setCouponError] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -59,7 +70,45 @@ export default function ProductConfigurator() {
 
   useEffect(() => {
     setImages((imgs) => (imgs.length > quantity ? imgs.slice(0, quantity) : imgs));
+    // Quantity change alters the price, so any applied coupon must be re-validated.
+    setAppliedCoupon(null);
+    setCouponError("");
   }, [quantity]);
+
+  async function applyCoupon() {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) {
+      setCouponError("Enter a coupon code.");
+      return;
+    }
+    setCouponError("");
+    setCouponLoading(true);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, quantity }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Invalid coupon");
+      setAppliedCoupon({
+        code: data.code,
+        discount: data.discount,
+        finalTotal: data.finalTotal,
+      });
+    } catch (err) {
+      setAppliedCoupon(null);
+      setCouponError(err instanceof Error ? err.message : "Invalid coupon");
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
+  function removeCoupon() {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  }
 
   const pricing = computePricing(quantity) ?? { quantity, subtotal: 0, gst: 0, total: 0 };
   const remaining = quantity - images.length;
@@ -119,8 +168,14 @@ export default function ProductConfigurator() {
 
   function handleBack() {
     setError("");
-    setStep((s) => (s === 3 ? 2 : 1));
+    setStep((s) => (s > 1 ? ((s - 1) as 1 | 2 | 3) : 1));
   }
+
+  function addressComplete() {
+    const required: (keyof Address)[] = ["fullName", "phone", "line1", "city", "state", "pincode"];
+    return required.every((f) => String(address[f] ?? "").trim());
+  }
+
   function handleNext() {
     if (step === 1) { setError(""); setStep(2); return; }
     if (step === 2) {
@@ -130,26 +185,123 @@ export default function ProductConfigurator() {
         return;
       }
       setError(""); setStep(3);
+      return;
+    }
+    if (step === 3) {
+      if (!addressComplete()) {
+        setError("Please complete your shipping details.");
+        return;
+      }
+      if (!/^\d{6}$/.test(String(address.pincode).trim())) {
+        setError("Please enter a valid 6-digit pincode.");
+        return;
+      }
+      setError(""); setStep(4);
     }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // form submit is used only for Back navigation; payment is triggered by handlePay
+  }
+
+  // Step 3: user clicks "Pay" → create DB order (if needed) → open Razorpay → verify
+  async function handlePay() {
     setError("");
     if (!user) { router.push(`/signin?redirect=${PRODUCT_PATH}`); return; }
     if (images.length !== quantity) { setError(`Please add ${quantity} photos.`); setStep(2); return; }
+
     setSubmitting(true);
+    let dbOrderId: string | null = null;
     try {
-      const res = await fetch("/api/orders", {
+      // 1. Create the order record in our DB (status: pending, paymentStatus: unpaid)
+      const createRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity, images, note, shippingAddress: address }),
+        body: JSON.stringify({
+          quantity,
+          images,
+          note,
+          shippingAddress: address,
+          couponCode: appliedCoupon?.code ?? null,
+          paymentMethod,
+        }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Could not place order");
+      const createData = await createRes.json();
+      if (!createRes.ok) throw new Error(createData.error ?? "Could not create order");
+      dbOrderId = createData.order.id;
+
+      // Cash on Delivery: the order is placed immediately, no online payment.
+      if (paymentMethod === "cod") {
+        router.push("/orders?success=cod");
+        return;
+      }
+
+      // 2. Create a Razorpay order (server-side) and get the rzp order id
+      const rzpCreateRes = await fetch("/api/payment/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: dbOrderId }),
+      });
+      const rzpCreateData = await rzpCreateRes.json();
+      if (!rzpCreateRes.ok) throw new Error(rzpCreateData.error ?? "Could not initiate payment");
+
+      setSubmitting(false); // release button while modal is open
+
+      // 3. Open Razorpay checkout modal
+      const result = await openRazorpayCheckout({
+        rzpOrderId: rzpCreateData.rzpOrderId,
+        amount: rzpCreateData.amount,
+        currency: rzpCreateData.currency,
+        keyId: rzpCreateData.keyId,
+        prefill: rzpCreateData.prefill,
+        description: `${quantity} Custom Photo Magnet${quantity > 1 ? "s" : ""} — swarnamaala.in`,
+      });
+
+      if (!result.success) {
+        // Payment failed or was dismissed — record it so the CRM can see it
+        await fetch("/api/payment/failed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: dbOrderId,
+            reason: result.error,
+            razorpayPaymentId: result.paymentId,
+          }),
+        }).catch(() => {});
+        setError(result.error);
+        router.push(`/orders?payment=pending&orderId=${dbOrderId}`);
+        return;
+      }
+
+      setSubmitting(true); // back to loading while verifying
+
+      // 4. Verify the payment signature on the server
+      const verifyRes = await fetch("/api/payment/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: dbOrderId,
+          razorpayOrderId: result.razorpayOrderId,
+          razorpayPaymentId: result.paymentId,
+          razorpaySignature: result.signature,
+        }),
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok) throw new Error(verifyData.error ?? "Payment verification failed");
+
       router.push("/orders?success=1");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not place order");
+      const errorMsg = err instanceof Error ? err.message : "Payment failed. Please try again.";
+      // Record failed payment if we have an order ID
+      if (dbOrderId) {
+        await fetch("/api/payment/failed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: dbOrderId, reason: errorMsg }),
+        }).catch(() => {});
+      }
+      setError(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -239,14 +391,22 @@ export default function ProductConfigurator() {
               removeImage={removeImage} useForAll={useForAll} handleFiles={handleFiles}
               clearAll={() => setImages([])} />}
             {step === 3 && (
+              <Step3 address={address} updateAddress={updateAddress} note={note} setNote={setNote} />
+            )}
+            {step === 4 && (
               <>
-                <Step3 address={address} updateAddress={updateAddress} note={note} setNote={setNote} />
+                <PaymentMethodStep paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod}
+                  codFee={COD_FEE} />
                 <OrderSummary pricing={pricing} quantity={quantity} submitting={submitting}
-                  uploading={uploading} user={!!user} error={step === 3 ? error : ""} />
+                  uploading={uploading} user={!!user} error={error}
+                  onPay={handlePay} paymentMethod={paymentMethod} codFee={COD_FEE}
+                  couponInput={couponInput} setCouponInput={setCouponInput}
+                  appliedCoupon={appliedCoupon} couponError={couponError}
+                  couponLoading={couponLoading} applyCoupon={applyCoupon} removeCoupon={removeCoupon} />
               </>
             )}
 
-            {error && step !== 3 && (
+            {error && step !== 4 && (
               <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>
             )}
 
@@ -255,7 +415,7 @@ export default function ProductConfigurator() {
                 className="cursor-pointer rounded-full border border-line bg-white px-5 py-2.5 text-sm font-semibold text-charcoal transition-colors hover:bg-cream disabled:invisible">
                 ← Back
               </button>
-              {step !== 3 ? (
+              {step !== 4 ? (
                 <button type="button" onClick={handleNext} disabled={uploading}
                   className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-terracotta px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60">
                   {uploading && <Spinner />}
@@ -488,10 +648,24 @@ function Step3({ address, updateAddress, note, setNote }: {
   );
 }
 
-function OrderSummary({ pricing, quantity, submitting, uploading, user, error }: {
+function OrderSummary({ pricing, quantity, submitting, uploading, user, error, onPay, paymentMethod, codFee,
+  couponInput, setCouponInput, appliedCoupon, couponError, couponLoading, applyCoupon, removeCoupon }: {
   pricing: { subtotal: number; gst: number; total: number };
   quantity: number; submitting: boolean; uploading: boolean; user: boolean; error: string;
+  onPay: () => void;
+  paymentMethod: PaymentMethod;
+  codFee: number;
+  couponInput: string;
+  setCouponInput: (v: string) => void;
+  appliedCoupon: { code: string; discount: number; finalTotal: number } | null;
+  couponError: string;
+  couponLoading: boolean;
+  applyCoupon: () => void;
+  removeCoupon: () => void;
 }) {
+  const isCod = paymentMethod === "cod";
+  const afterDiscount = appliedCoupon ? appliedCoupon.finalTotal : pricing.total;
+  const payable = afterDiscount + (isCod ? codFee : 0);
   return (
     <div className="rounded-2xl border border-line bg-white p-5 shadow-sm">
       <h3 className="mb-3 font-semibold text-charcoal">Order summary</h3>
@@ -499,28 +673,95 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error }:
         <span className="text-muted">{quantityLabel(quantity)}</span>
         <span className="font-medium text-charcoal">{CURRENCY_SYMBOL}{pricing.subtotal}</span>
       </div>
-      <div className="mt-2 flex items-center justify-between text-sm">
-        <span className="text-muted">GST ({Math.round(GST_RATE * 100)}%)</span>
-        <span className="font-medium text-charcoal">{CURRENCY_SYMBOL}{pricing.gst}</span>
+
+      {/* Coupon code */}
+      <div className="mt-4 border-t border-line pt-4">
+        {appliedCoupon ? (
+          <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+            <div className="text-sm">
+              <span className="font-semibold text-emerald-700">{appliedCoupon.code}</span>
+              <span className="ml-2 text-emerald-600">applied</span>
+            </div>
+            <button type="button" onClick={removeCoupon}
+              className="cursor-pointer text-xs font-medium text-muted hover:text-red-500">
+              Remove
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <input
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyCoupon(); } }}
+              placeholder="Coupon code"
+              className="input flex-1 uppercase"
+            />
+            <button type="button" onClick={applyCoupon} disabled={couponLoading}
+              className="cursor-pointer rounded-full border border-terracotta bg-white px-5 py-2 text-sm font-semibold text-terracotta hover:bg-terracotta/10 disabled:opacity-60">
+              {couponLoading ? "…" : "Apply"}
+            </button>
+          </div>
+        )}
+        {couponError && <p className="mt-2 text-xs text-red-600">{couponError}</p>}
       </div>
-      <div className="mt-2 flex items-center justify-between border-t border-line pt-3">
+
+      {appliedCoupon && (
+        <div className="mt-3 flex items-center justify-between text-sm">
+          <span className="text-emerald-700">Discount</span>
+          <span className="font-medium text-emerald-700">
+            &minus;{CURRENCY_SYMBOL}{appliedCoupon.discount}
+          </span>
+        </div>
+      )}
+
+      <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
         <span className="font-semibold text-charcoal">Total payable</span>
-        <span className="text-2xl font-extrabold text-terracotta">{CURRENCY_SYMBOL}{pricing.total}</span>
+        <span className="text-2xl font-extrabold text-terracotta">{CURRENCY_SYMBOL}{payable}</span>
       </div>
+
       {error && <p className="mt-4 rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>}
-      <button type="submit" disabled={submitting || uploading}
-        className="mt-4 w-full cursor-pointer rounded-full bg-terracotta px-6 py-4 text-base font-semibold text-white shadow-md transition-colors hover:bg-terracotta-dark disabled:cursor-not-allowed disabled:opacity-60">
+
+      {/* Pay online with Razorpay */}
+      <button
+        type="button"
+        onClick={onPay}
+        disabled={submitting || uploading || !user}
+        className="mt-4 w-full cursor-pointer rounded-full bg-terracotta px-6 py-4 text-base font-semibold text-white shadow-md transition-colors hover:bg-terracotta-dark disabled:cursor-not-allowed disabled:opacity-60"
+      >
         {!user ? "Sign in to place order"
-          : submitting ? "Placing order…"
-          : `Place order · ${CURRENCY_SYMBOL}${pricing.total}`}
+          : submitting ? "Processing payment…"
+          : `Pay ${CURRENCY_SYMBOL}${payable} · Razorpay`}
       </button>
-      <div className="mt-3 flex items-center justify-center gap-4 text-xs text-muted">
-        <span>✅ Pay on delivery</span>
-        <span>|</span>
-        <span>📦 Packed with care</span>
-        <span>|</span>
-        <span>🔁 Easy replacement</span>
+
+      {/* Trust badges */}
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted">
+        <span className="flex items-center gap-1">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          100% secure
+        </span>
+        <span className="flex items-center gap-1">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" />
+            <path d="M1 10h22" />
+          </svg>
+          UPI / Card / Net banking
+        </span>
+        <span className="flex items-center gap-1">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Instant confirmation
+        </span>
       </div>
+
+      {/* Razorpay branding */}
+      <p className="mt-2 text-center text-[10px] text-muted/70">
+        Powered by{" "}
+        <span className="font-semibold text-[#072654]">Razorpay</span>
+        &nbsp;· Your payment is encrypted &amp; secure
+      </p>
     </div>
   );
 }
@@ -539,6 +780,14 @@ function Field({ label, className = "", children }: {
 // ---- Customer Reviews Section ----
 
 const CUSTOMER_REVIEWS = [
+  {
+    name: "Priyanka Thankur",
+    location: "Greater Noida",
+    rating: 5,
+    text: "Very Nice, Product print is too good.",
+    photo: "/feedback/customer4.jpeg",
+    verified: true,
+  },
    {
     name: "Deepak Chaudhary",
     location: "Noida",

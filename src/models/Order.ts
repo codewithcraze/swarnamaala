@@ -33,6 +33,15 @@ const OrderSchema = new Schema(
     amount: { type: Number, required: true, min: 0 },
     currency: { type: String, required: true, default: "INR" },
 
+    // Coupon applied at checkout (if any). total already reflects the discount.
+    couponCode: { type: String, default: null, uppercase: true, trim: true },
+    discount: { type: Number, default: 0, min: 0 },
+
+    // Payment method chosen at checkout.
+    // "online" -> paid via Razorpay; "cod" -> pay on delivery (+ codFee).
+    paymentMethod: { type: String, enum: ["online", "cod"], default: "online" },
+    codFee: { type: Number, default: 0, min: 0 },
+
     images: {
       type: [String],
       required: true,
@@ -50,9 +59,19 @@ const OrderSchema = new Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ["unpaid", "paid", "refunded"],
+      enum: ["unpaid", "paid", "failed", "refunded"],
       default: "unpaid",
     },
+
+    // Razorpay payment tracking
+    razorpayOrderId: { type: String, index: true, sparse: true },
+    razorpayPaymentId: { type: String, sparse: true },
+    razorpaySignature: { type: String },
+    paidAt: { type: Date },
+
+    // Failed payment tracking
+    paymentFailedAt: { type: Date },
+    paymentFailureReason: { type: String },
 
     // Referral tracking: who referred the buyer, the reward they earn, and
     // whether it has been credited (credited once the order is delivered).

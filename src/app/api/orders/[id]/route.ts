@@ -115,6 +115,10 @@ export async function PATCH(request: Request, { params }: Ctx) {
       gst: pricing.gst,
       total: pricing.total,
       amount: pricing.total,
+      // Editing recomputes the price from scratch; any previously applied
+      // coupon is dropped and must be re-applied at checkout.
+      couponCode: null,
+      discount: 0,
       images,
       note,
       referralReward: reward,

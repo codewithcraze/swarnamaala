@@ -3,8 +3,10 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Order } from "@/models/Order";
 import { User } from "@/models/User";
 import { getSessionUser } from "@/lib/auth";
-import { computePricing, quantityLabel, referralReward, CURRENCY } from "@/lib/pricing";
+import { computePricing, quantityLabel, referralReward, CURRENCY, COD_FEE } from "@/lib/pricing";
 import { isValidUploadUrl } from "@/lib/s3";
+import { Coupon } from "@/models/Coupon";
+import { evaluateCoupon, type CouponLike } from "@/lib/coupon";
 
 export async function GET() {
   const session = await getSessionUser();
@@ -82,11 +84,38 @@ export async function POST(request: Request) {
 
     await connectToDatabase();
 
+    // Payment method: "online" (Razorpay) or "cod" (pay on delivery, +COD_FEE).
+    const paymentMethod = body.paymentMethod === "cod" ? "cod" : "online";
+
+    // Apply a coupon if one was provided. The discount is always recomputed
+    // server-side from the trusted coupon document.
+    let couponCode: string | null = null;
+    let discount = 0;
+    let afterDiscount = pricing.total;
+    const rawCoupon = String(body.couponCode ?? "").trim().toUpperCase();
+    if (rawCoupon) {
+      const coupon = (await Coupon.findOne({ code: rawCoupon }).lean()) as CouponLike | null;
+      const result = evaluateCoupon(coupon, {
+        subtotal: pricing.subtotal,
+        total: pricing.total,
+      });
+      if (!result.ok) {
+        return NextResponse.json({ error: result.error }, { status: 400 });
+      }
+      couponCode = rawCoupon;
+      discount = result.discount;
+      afterDiscount = result.finalTotal;
+    }
+
+    // COD fee is added after any coupon discount. Online payments have no fee.
+    const codFee = paymentMethod === "cod" ? COD_FEE : 0;
+    const finalTotal = afterDiscount + codFee;
+
     // Referral snapshot: if this buyer was referred, record the referrer and
     // the reward they will earn once this order is delivered.
     const buyer = await User.findById(session.id).lean<{ referredBy?: unknown }>();
     const referrer = buyer?.referredBy ?? null;
-    const reward = referrer ? referralReward(pricing.total) : 0;
+    const reward = referrer ? referralReward(afterDiscount) : 0;
 
     const order = await Order.create({
       user: session.id,
@@ -95,9 +124,13 @@ export async function POST(request: Request) {
       unitLabel: quantityLabel(quantity),
       subtotal: pricing.subtotal,
       gst: pricing.gst,
-      total: pricing.total,
-      amount: pricing.total,
+      total: finalTotal,
+      amount: finalTotal,
       currency: CURRENCY,
+      couponCode,
+      discount,
+      paymentMethod,
+      codFee,
       images,
       note,
       shippingAddress: {
@@ -115,7 +148,15 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({
-      order: { id: order._id.toString(), total: pricing.total, quantity },
+      order: {
+        id: order._id.toString(),
+        total: finalTotal,
+        quantity,
+        discount,
+        couponCode,
+        paymentMethod,
+        codFee,
+      },
     });
   } catch (err) {
     console.error("orders POST error", err);

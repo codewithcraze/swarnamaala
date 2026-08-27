@@ -22,8 +22,12 @@ export const EXTRA_MAGNET_PRICE = 70;
 export const BASE_PACK_QTY = 10;
 export const BASE_PACK_PRICE = 699;
 
-// GST applied on top of the pre-tax subtotal.
-export const GST_RATE = 0.18;
+// GST has been removed — prices are all-inclusive. Kept as 0 so any legacy
+// reference stays valid without adding tax.
+export const GST_RATE = 0;
+
+// Flat fee added for Cash on Delivery orders. Online payments have no fee.
+export const COD_FEE = 49;
 
 export const MAX_QUANTITY = 100;
 
@@ -67,8 +71,8 @@ export type PriceBreakdown = {
 export function computePricing(quantity: number): PriceBreakdown | null {
   const subtotal = computeSubtotal(quantity);
   if (subtotal === null) return null;
-  const gst = Math.round(subtotal * GST_RATE);
-  return { quantity, subtotal, gst, total: subtotal + gst };
+  // No GST — the total equals the subtotal.
+  return { quantity, subtotal, gst: 0, total: subtotal };
 }
 
 export function isAllowedQuantity(quantity: number): boolean {
