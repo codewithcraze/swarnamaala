@@ -648,6 +648,56 @@ function Step3({ address, updateAddress, note, setNote }: {
   );
 }
 
+function PaymentMethodStep({ paymentMethod, setPaymentMethod, codFee }: {
+  paymentMethod: PaymentMethod;
+  setPaymentMethod: (method: PaymentMethod) => void;
+  codFee: number;
+}) {
+  return (
+    <section>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-terracotta">4. Payment method</h2>
+      <div className="mt-3 space-y-3">
+        <label className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all ${
+          paymentMethod === "online" ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-white hover:border-terracotta/50"
+        }`}>
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="online"
+            checked={paymentMethod === "online"}
+            onChange={() => setPaymentMethod("online")}
+            className="h-4 w-4 accent-terracotta"
+          />
+          <div className="flex-1">
+            <p className="font-semibold text-charcoal">Online payment</p>
+            <p className="text-xs text-muted">UPI, Cards, Net Banking via Razorpay · No extra charge</p>
+          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            Recommended
+          </span>
+        </label>
+
+        <label className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all ${
+          paymentMethod === "cod" ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-white hover:border-terracotta/50"
+        }`}>
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="cod"
+            checked={paymentMethod === "cod"}
+            onChange={() => setPaymentMethod("cod")}
+            className="h-4 w-4 accent-terracotta"
+          />
+          <div className="flex-1">
+            <p className="font-semibold text-charcoal">Cash on Delivery (COD)</p>
+            <p className="text-xs text-muted">Pay when you receive · {CURRENCY_SYMBOL}{codFee} handling charge applies</p>
+          </div>
+        </label>
+      </div>
+    </section>
+  );
+}
+
 function OrderSummary({ pricing, quantity, submitting, uploading, user, error, onPay, paymentMethod, codFee,
   couponInput, setCouponInput, appliedCoupon, couponError, couponLoading, applyCoupon, removeCoupon }: {
   pricing: { subtotal: number; gst: number; total: number };
@@ -714,6 +764,13 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
         </div>
       )}
 
+      {isCod && (
+        <div className="mt-3 flex items-center justify-between text-sm">
+          <span className="text-muted">COD handling charge</span>
+          <span className="font-medium text-charcoal">+{CURRENCY_SYMBOL}{codFee}</span>
+        </div>
+      )}
+
       <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
         <span className="font-semibold text-charcoal">Total payable</span>
         <span className="text-2xl font-extrabold text-terracotta">{CURRENCY_SYMBOL}{payable}</span>
@@ -721,7 +778,6 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
 
       {error && <p className="mt-4 rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>}
 
-      {/* Pay online with Razorpay */}
       <button
         type="button"
         onClick={onPay}
@@ -729,7 +785,8 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
         className="mt-4 w-full cursor-pointer rounded-full bg-terracotta px-6 py-4 text-base font-semibold text-white shadow-md transition-colors hover:bg-terracotta-dark disabled:cursor-not-allowed disabled:opacity-60"
       >
         {!user ? "Sign in to place order"
-          : submitting ? "Processing payment…"
+          : submitting ? (isCod ? "Placing order…" : "Processing payment…")
+          : isCod ? `Place Order (COD) · ${CURRENCY_SYMBOL}${payable}`
           : `Pay ${CURRENCY_SYMBOL}${payable} · Razorpay`}
       </button>
 
@@ -741,13 +798,15 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
           </svg>
           100% secure
         </span>
-        <span className="flex items-center gap-1">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="1" y="4" width="22" height="16" rx="2" />
-            <path d="M1 10h22" />
-          </svg>
-          UPI / Card / Net banking
-        </span>
+        {!isCod && (
+          <span className="flex items-center gap-1">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" />
+              <path d="M1 10h22" />
+            </svg>
+            UPI / Card / Net banking
+          </span>
+        )}
         <span className="flex items-center gap-1">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polyline points="20 6 9 17 4 12" />
@@ -756,12 +815,14 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
         </span>
       </div>
 
-      {/* Razorpay branding */}
-      <p className="mt-2 text-center text-[10px] text-muted/70">
-        Powered by{" "}
-        <span className="font-semibold text-[#072654]">Razorpay</span>
-        &nbsp;· Your payment is encrypted &amp; secure
-      </p>
+      {/* Payment provider branding */}
+      {!isCod && (
+        <p className="mt-2 text-center text-[10px] text-muted/70">
+          Powered by{" "}
+          <span className="font-semibold text-[#072654]">Razorpay</span>
+          &nbsp;· Your payment is encrypted &amp; secure
+        </p>
+      )}
     </div>
   );
 }

@@ -72,7 +72,7 @@ export default function BannerCarousel() {
               fill
               priority={i === 0}
               className="object-contain object-center"
-              sizes="100vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1280px"
             />
             {/* CTA overlay */}
             <div className="absolute bottom-4 right-4 z-20 hidden sm:block">
