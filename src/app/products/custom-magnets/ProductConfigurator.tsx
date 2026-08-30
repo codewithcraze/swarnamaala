@@ -848,13 +848,15 @@ const CUSTOMER_REVIEWS = [
     location: "Dwarka, Delhi",
     rating: 5,
     text: "Print is good and magnet is too strong.",
-    image: "/feedback/alka.jpeg"
+      verified: true,
+    photo: "/feedback/alka.jpeg"
   },  {
     name: "Shekhar & Suman",
     location: "Bulandshahr",
     rating: 5,
     text: "Nice Magnets, Amazing product.",
-    image: "/feedback/suman.jpeg"
+      verified: true,
+    photo: "/feedback/suman.jpeg"
   },
   {
     name: "Priyanka Thankur",
