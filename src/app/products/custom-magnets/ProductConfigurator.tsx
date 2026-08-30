@@ -843,6 +843,19 @@ function Field({ label, className = "", children }: {
 // ---- Customer Reviews Section ----
 
 const CUSTOMER_REVIEWS = [
+    {
+    name: "Alka Chaudhary",
+    location: "Dwarka, Delhi",
+    rating: 5,
+    text: "Print is good and magnet is too strong.",
+    image: "/feedback/alka.jpeg"
+  },  {
+    name: "Shekhar & Suman",
+    location: "Bulandshahr",
+    rating: 5,
+    text: "Nice Magnets, Amazing product.",
+    image: "/feedback/suman.jpeg"
+  },
   {
     name: "Priyanka Thankur",
     location: "Greater Noida",

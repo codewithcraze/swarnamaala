@@ -8,6 +8,19 @@ export type Review = {
 
 // Sample customer reviews from the Delhi NCR region.
 export const REVIEWS: Review[] = [
+    {
+    name: "Alka Chaudhary",
+    location: "Dwarka, Delhi",
+    rating: 5,
+    text: "Print is good and magnet is too strong.",
+    image: "/feedback/alka.jpeg"
+  },  {
+    name: "Shekhar & Suman",
+    location: "Bulandshahr",
+    rating: 5,
+    text: "Nice Magnets, Amazing product.",
+    image: "/feedback/suman.jpeg"
+  },
    {
     name: "Priyanka Thakur",
     location: "Greater Noida",
@@ -49,14 +62,7 @@ export const REVIEWS: Review[] = [
     rating: 5,
     text: "Used the same baby photo for all 6 magnets and gifted them to family. The finish is glossy and looks really premium.",
     image: ""
-  },
-  {
-    name: "Aditya Rao",
-    location: "Cyber City, Gurugram",
-    rating: 5,
-    text: "Fast, easy and beautiful. Uploaded from my phone, ordered in two minutes, and got them delivered to Gurugram within the week.",
-    image: ""
-  },
+  }
 ];
 
 export const AVERAGE_RATING =
