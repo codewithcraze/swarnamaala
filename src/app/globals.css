@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
-/* Two luxury themes sharing one set of tokens. Light (ivory + deep antique
-   gold) is the default; dark (espresso + champagne gold) applies when
-   <html data-theme="dark">. Token names are kept from the original theme:
+/* Two luxury themes sharing one set of tokens. Dark (espresso + champagne
+   gold) is the site default and applies when <html data-theme="dark">, which
+   the layout sets unless the visitor picked light (ivory + deep antique gold).
+   Token names are kept from the original theme:
    cream = page background, surface = cards, charcoal = primary text,
    terracotta = primary gold accent, gold = soft highlight,
    onaccent = text placed on gold fills. */

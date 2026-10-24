@@ -72,7 +72,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F8F3EC",
+  themeColor: "#110D0A",
   width: "device-width",
   initialScale: 1,
 };
@@ -93,7 +93,7 @@ export default function RootLayout({
   return (
     // data-theme is set by the inline script before paint; suppress the
     // expected server/client attribute mismatch on <html>.
-    <html lang="en" className={poppins.variable} data-theme="light" suppressHydrationWarning>
+    <html lang="en" className={poppins.variable} data-theme="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>

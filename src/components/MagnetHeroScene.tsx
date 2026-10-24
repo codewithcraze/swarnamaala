@@ -9,25 +9,24 @@ import { loadMagnetTexture } from "@/lib/magnetTexture";
 const D = 0.1;
 type Shape = "rect" | "square";
 // rect = 90mm x 65mm; square sized to sit nicely beside it.
-const SIZE: Record<Shape, [number, number]> = { rect: [2.35, 1.7], square: [1.85, 1.85] };
+const SIZE: Record<Shape, [number, number]> = { rect: [2.9, 2.1], square: [2.3, 2.3] };
 
 type Placement = { image: string; shape: Shape; x: number; y: number; rot: number; delay: number };
 
-// 3 columns x 3 rows (bottom row has two). Layout is centered on the origin so
-// the whole field can be scaled to fit any screen size.
+// Six large magnets: 2 columns x 3 rows, shapes alternating so rectangles and
+// squares interlock; the right column sits slightly lower for a hand-placed
+// look. Centered on the origin so the field can be scaled to any screen size.
 const PLACEMENTS: Placement[] = [
-  { image: "/family.avif", shape: "rect", x: -2.65, y: 2.15, rot: -0.08, delay: 0 },
-  { image: "/love.avif", shape: "square", x: 0, y: 2.2, rot: 0.05, delay: 0.12 },
-  { image: "/travel.avif", shape: "rect", x: 2.65, y: 2.1, rot: 0.1, delay: 0.24 },
-  { image: "/birthday.avif", shape: "square", x: -2.65, y: 0, rot: 0.07, delay: 0.36 },
-  { image: "/travel.avif", shape: "square", x: 0, y: -0.05, rot: -0.09, delay: 0.48 },
-  { image: "/family.avif", shape: "rect", x: 2.65, y: 0.05, rot: 0.04, delay: 0.6 },
-  { image: "/love.avif", shape: "rect", x: -1.35, y: -2.15, rot: 0.06, delay: 0.72 },
-  { image: "/birthday.avif", shape: "rect", x: 1.4, y: -2.1, rot: -0.05, delay: 0.84 },
+  { image: "/family.avif", shape: "rect", x: -1.62, y: 2.45, rot: -0.07, delay: 0 },
+  { image: "/love.avif", shape: "square", x: 1.62, y: 2.3, rot: 0.06, delay: 0.14 },
+  { image: "/birthday.avif", shape: "square", x: -1.62, y: 0, rot: 0.05, delay: 0.28 },
+  { image: "/travel.avif", shape: "rect", x: 1.62, y: -0.15, rot: -0.08, delay: 0.42 },
+  { image: "/travel.avif", shape: "rect", x: -1.62, y: -2.45, rot: 0.07, delay: 0.56 },
+  { image: "/family.avif", shape: "square", x: 1.62, y: -2.6, rot: -0.05, delay: 0.7 },
 ];
 // Size of the whole layout (plus a little breathing room), used to fit it to the canvas.
-const FIELD_W = 7.9;
-const FIELD_H = 6.4;
+const FIELD_W = 6.5;
+const FIELD_H = 7.6;
 
 // Overshoot-then-settle easing, so each magnet "snaps" onto the fridge.
 function easeOutBack(p: number) {

@@ -13,7 +13,7 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
   const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
-    setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light");
+    setTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark");
   }, []);
 
   function toggle() {
