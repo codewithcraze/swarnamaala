@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import Confetti from "@/components/Confetti";
+import { OrderThumbs, OrderTimeline, StatePill, formatDate } from "@/components/OrderParts";
 import { CURRENCY_SYMBOL } from "@/lib/pricing";
-import { openRazorpayCheckout } from "@/lib/razorpay";
+import { payOrder } from "@/lib/payOrder";
+import { TABS, type TabKey, viewState, needsPayment, canEdit, STATE_NOTE } from "@/lib/orderView";
 
 type Order = {
   _id: string;
@@ -15,397 +17,312 @@ type Order = {
   unitLabel: string;
   amount: number;
   total?: number;
-  subtotal?: number;
-  gst?: number;
   images: string[];
   status: string;
   paymentStatus: string;
-  razorpayOrderId?: string;
-  razorpayPaymentId?: string;
-  paidAt?: string;
+  paymentMethod?: string;
   createdAt: string;
-  shippingAddress: {
-    fullName: string;
-    phone: string;
-    city: string;
-    state: string;
-    pincode: string;
-  };
+  shippingAddress: { fullName: string; city: string; state: string; pincode: string };
 };
 
-const ORDER_STATUS_STYLES: Record<string, string> = {
-  pending: "bg-gold/20 text-terracotta-dark",
-  processing: "bg-sky-100 text-sky-700",
-  shipped: "bg-indigo-100 text-indigo-700",
-  delivered: "bg-emerald-100 text-emerald-400",
-  cancelled: "bg-red-100 text-red-400",
-};
-
-const PAYMENT_STATUS_STYLES: Record<string, string> = {
-  unpaid: "bg-red-500/10 text-red-400 border-red-200",
-  paid: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-  failed: "bg-orange-50 text-orange-700 border-orange-200",
-  refunded: "bg-gold/20 text-terracotta-dark border-gold/40",
-};
+const PAGE_SIZE = 5;
 
 export default function OrdersClient() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const params = useSearchParams();
 
-  const showSuccess = searchParams.get("success") === "1";
-  const showUpdated = searchParams.get("updated") === "1";
-  const paymentPending = searchParams.get("payment") === "pending";
-  const pendingOrderId = searchParams.get("orderId");
+  const placed = params.get("success") === "1" || params.get("success") === "cod";
+  const isCodPlaced = params.get("success") === "cod";
+  const updated = params.get("updated") === "1";
+  const paymentPending = params.get("payment") === "pending";
 
+  const [tab, setTab] = useState<TabKey>("all");
+  const [page, setPage] = useState(1);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [cancellingId, setCancellingId] = useState<string | null>(null);
-  const [payingId, setPayingId] = useState<string | null>(null);
-  const [payError, setPayError] = useState("");
+  const [banner, setBanner] = useState<"placed" | "updated" | "pending" | null>(
+    placed ? "placed" : updated ? "updated" : paymentPending ? "pending" : null
+  );
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
-  const loadOrders = useCallback(() => {
-    fetch("/api/orders", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => setOrders(data.orders ?? []))
-      .catch(() => setOrders([]))
-      .finally(() => setLoading(false));
+  const load = useCallback(async (t: TabKey, p: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/orders?tab=${t}&page=${p}&limit=${PAGE_SIZE}`, { cache: "no-store" });
+      const data = await res.json();
+      setOrders(data.orders ?? []);
+      setCounts(data.counts ?? {});
+      setPages(data.pages ?? 1);
+    } catch {
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) { router.push("/signin?redirect=/orders"); return; }
-    loadOrders();
-  }, [user, authLoading, router, loadOrders]);
+    if (!user) {
+      router.push("/signin?redirect=/orders");
+      return;
+    }
+    load(tab, page);
+  }, [user, authLoading, router, load, tab, page]);
 
-  async function handleCancel(id: string) {
-    if (!window.confirm("Cancel this order? This cannot be undone.")) return;
-    setCancellingId(id);
+  function chooseTab(t: TabKey) {
+    setTab(t);
+    setPage(1);
+  }
+
+  async function pay(o: Order) {
+    setError("");
+    setBusyId(o._id);
     try {
-      const res = await fetch(`/api/orders/${id}`, { method: "DELETE" });
+      await payOrder(o._id, `${o.unitLabel} — swarnamaala.in`);
+      setBanner("placed");
+      await load(tab, page);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Payment failed.");
+      await load(tab, page);
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function cancel(o: Order) {
+    if (!window.confirm("Cancel this order? This cannot be undone.")) return;
+    setBusyId(o._id);
+    try {
+      const res = await fetch(`/api/orders/${o._id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not cancel order");
-      setOrders((prev) => prev.map((o) => o._id === id ? { ...o, status: "cancelled" } : o));
-    } catch (err) {
-      window.alert(err instanceof Error ? err.message : "Could not cancel order");
+      await load(tab, page);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not cancel order");
     } finally {
-      setCancellingId(null);
+      setBusyId(null);
     }
   }
 
-  async function handlePayNow(order: Order) {
-    setPayError("");
-    setPayingId(order._id);
-    try {
-      // Create / fetch the Razorpay order from our server
-      const createRes = await fetch("/api/payment/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: order._id }),
-      });
-      const createData = await createRes.json();
-      if (!createRes.ok) throw new Error(createData.error ?? "Could not initiate payment");
-
-      setPayingId(null); // Release button while modal is open
-
-      // Open Razorpay checkout modal
-      const result = await openRazorpayCheckout({
-        rzpOrderId: createData.rzpOrderId,
-        amount: createData.amount,
-        currency: createData.currency,
-        keyId: createData.keyId,
-        prefill: createData.prefill,
-        description: `${order.unitLabel} — swarnamaala.in`,
-      });
-
-      if (!result.success) {
-        // Record the failed/cancelled payment so it shows in CRM
-        await fetch("/api/payment/failed", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderId: order._id,
-            reason: result.error,
-            razorpayPaymentId: result.paymentId,
-          }),
-        }).catch(() => {}); // best-effort, don't block the UI
-        setOrders((prev) =>
-          prev.map((o) =>
-            o._id === order._id ? { ...o, paymentStatus: "failed" } : o
-          )
-        );
-        setPayError(result.error);
-        return;
-      }
-
-      setPayingId(order._id);
-
-      // Verify payment on server
-      const verifyRes = await fetch("/api/payment/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: order._id,
-          razorpayOrderId: result.razorpayOrderId,
-          razorpayPaymentId: result.paymentId,
-          razorpaySignature: result.signature,
-        }),
-      });
-      const verifyData = await verifyRes.json();
-      if (!verifyRes.ok) throw new Error(verifyData.error ?? "Payment verification failed");
-
-      // Optimistically update UI
-      setOrders((prev) =>
-        prev.map((o) =>
-          o._id === order._id
-            ? { ...o, paymentStatus: "paid", razorpayPaymentId: result.paymentId }
-            : o
-        )
-      );
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Payment failed. Please try again.";
-      // Record the failed payment so it shows in CRM
-      await fetch("/api/payment/failed", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: order._id, reason: errorMsg }),
-      }).catch(() => {});
-      setOrders((prev) =>
-        prev.map((o) =>
-          o._id === order._id ? { ...o, paymentStatus: "failed" } : o
-        )
-      );
-      setPayError(errorMsg);
-    } finally {
-      setPayingId(null);
-    }
-  }
-
-  if (authLoading || loading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-muted">
-          <svg className="h-8 w-8 animate-spin text-terracotta" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-            <path className="opacity-90" d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-          </svg>
-          <span className="text-sm">Loading your orders…</span>
-        </div>
-      </div>
-    );
-  }
+  const btn =
+    "inline-flex items-center justify-center gap-2 rounded-xl border-[1.5px] border-line px-4 py-2.5 text-sm font-semibold text-charcoal transition-colors hover:border-muted disabled:opacity-50";
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <div className="mx-auto max-w-[1000px] px-4 pb-20 pt-8 sm:px-6 sm:pt-10">
+      {placed && <Confetti />}
 
-      {/* Success banner */}
-      {showSuccess && (
-        <div className="mb-6 flex items-start gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
-          <span className="text-2xl">🎉</span>
-          <div>
-            <p className="font-semibold text-emerald-400">Order placed &amp; payment confirmed!</p>
-            <p className="mt-1 text-sm text-emerald-300">
-              We&apos;ve received your order. Sit back — we&apos;ll start printing right away.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Updated banner */}
-      {showUpdated && (
-        <div className="mb-6 rounded-2xl border border-line bg-gold/15 p-5">
-          <p className="font-semibold text-terracotta-dark">Order updated successfully!</p>
-          <p className="mt-1 text-sm text-muted">Your changes have been saved.</p>
-        </div>
-      )}
-
-      {/* Payment-pending banner */}
-      {paymentPending && pendingOrderId && (
-        <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-terracotta/40 bg-terracotta/8 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-semibold text-terracotta-dark">⚠ Payment incomplete</p>
-            <p className="mt-1 text-sm text-muted">
-              Your order was created but payment wasn&apos;t completed. Click Pay Now to finish.
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              const order = orders.find((o) => o._id === pendingOrderId);
-              if (order) handlePayNow(order);
-            }}
-            className="shrink-0 rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-onaccent hover:bg-terracotta-dark"
-          >
-            Pay Now
-          </button>
-        </div>
-      )}
-
-      {/* Global pay error */}
-      {payError && (
-        <div className="mb-6 rounded-2xl border border-red-200 bg-red-500/10 p-4">
-          <p className="text-sm font-medium text-red-400">{payError}</p>
-          <button onClick={() => setPayError("")} className="mt-1 text-xs text-red-400 hover:underline">
-            Dismiss
-          </button>
-        </div>
-      )}
-
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-charcoal">My Orders</h1>
-        <Link
-          href="/products/custom-magnets"
-          className="rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-onaccent transition-colors hover:bg-terracotta-dark"
+      {banner && (
+        <div
+          role="status"
+          className={`mb-8 flex items-center gap-3.5 rounded-2xl border px-[18px] py-3.5 ${
+            banner === "pending" ? "border-amber-400/40 bg-amber-400/10" : "border-emerald-500/35 bg-emerald-500/10"
+          }`}
         >
+          <span
+            className={`grid h-[30px] w-[30px] flex-none place-items-center rounded-full ${
+              banner === "pending" ? "bg-amber-300 text-[#2a1d05]" : "bg-emerald-400 text-[#0d2418]"
+            }`}
+          >
+            {banner === "pending" ? "!" : (
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                <path d="M3 8.5l3.2 3.2L13 4.8" />
+              </svg>
+            )}
+          </span>
+          <div>
+            <b className="block text-[15px] text-charcoal">
+              {banner === "placed"
+                ? isCodPlaced ? "Order placed! Pay when it arrives." : "Order placed and payment confirmed!"
+                : banner === "updated" ? "Order updated successfully" : "Payment not completed"}
+            </b>
+            <span className="text-[13.5px] text-muted">
+              {banner === "placed"
+                ? "We'll start printing right away and email you as it moves along."
+                : banner === "updated" ? "Your changes have been saved." : "Your order is saved. Use Pay now below to confirm it."}
+            </span>
+          </div>
+          <button aria-label="Dismiss" onClick={() => setBanner(null)} className="ml-auto cursor-pointer px-2 py-1 text-[22px] leading-none text-muted">
+            ×
+          </button>
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          {error}
+          <button onClick={() => setError("")} className="text-xs underline">Dismiss</button>
+        </div>
+      )}
+
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <h1 className="m-0 text-[28px] font-bold tracking-tight text-charcoal sm:text-[38px]">My Orders</h1>
+        <Link href="/products/custom-magnets" className={`${btn} border-terracotta bg-terracotta text-onaccent hover:border-terracotta-dark hover:bg-terracotta-dark`}>
           + New order
         </Link>
       </div>
 
-      {orders.length === 0 ? (
-        <div className="mt-12 rounded-3xl border border-line bg-surface p-12 text-center shadow-sm">
-          <div className="text-5xl">🧲</div>
-          <p className="mt-4 text-lg font-semibold text-charcoal">No orders yet</p>
-          <p className="mt-1 text-sm text-muted">Upload your photos and create your first custom magnet.</p>
-          <Link
-            href="/products/custom-magnets"
-            className="mt-6 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-onaccent hover:bg-terracotta-dark"
+      {/* Tabs */}
+      <div className="no-scrollbar mb-6 flex gap-2 overflow-x-auto pb-0.5" role="tablist">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            role="tab"
+            aria-selected={tab === t.key}
+            onClick={() => chooseTab(t.key)}
+            className={`flex-none cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+              tab === t.key ? "border-charcoal bg-charcoal text-onaccent" : "border-line text-muted hover:text-charcoal"
+            }`}
           >
-            Start creating
-          </Link>
+            {t.label}
+            <em className="ml-1.5 not-italic opacity-70">{counts[t.key] ?? 0}</em>
+          </button>
+        ))}
+      </div>
+
+      {/* List */}
+      {loading ? (
+        <div className="grid gap-[18px]">
+          {[0, 1].map((i) => (
+            <div key={i} className="shimmer h-[190px] rounded-[22px] border border-line" />
+          ))}
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="rounded-[22px] border border-line bg-surface px-6 py-12 text-center">
+          <p className="text-lg font-semibold text-charcoal">{tab === "all" ? "No orders yet" : "No orders here"}</p>
+          <p className="mt-1 text-sm text-muted">
+            {tab === "all" ? "Upload your photos and create your first custom magnets." : "Try another tab."}
+          </p>
+          {tab === "all" && (
+            <Link href="/products/custom-magnets" className={`${btn} mt-6 border-terracotta bg-terracotta text-onaccent`}>
+              Start creating
+            </Link>
+          )}
         </div>
       ) : (
-        <div className="mt-8 space-y-4">
-          {orders.map((order) => {
-            const imgs = order.images ?? [];
-            const total = order.total ?? order.amount;
-            const isPaid = order.paymentStatus === "paid";
-            const isUnpaid = order.paymentStatus === "unpaid";
-            const isPending = order.status === "pending";
-            const isCancelled = order.status === "cancelled";
-
+        <div className="grid gap-[18px]">
+          {orders.map((o) => {
+            const s = viewState(o);
+            const payable = needsPayment(o);
+            const editable = canEdit(o);
+            const href = `/orders/${o._id}`;
             return (
-              <div
-                key={order._id}
-                className={`rounded-2xl border bg-surface shadow-sm transition-shadow hover:shadow-md ${
-                  isUnpaid && !isCancelled ? "border-terracotta/40" : "border-line"
+              <article
+                key={o._id}
+                className={`overflow-hidden rounded-[22px] border bg-surface transition-colors hover:border-terracotta/60 ${
+                  s === "failed" ? "border-red-400/45" : payable ? "border-amber-300/45" : "border-line"
                 }`}
               >
-                <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start">
-                  {/* Thumbnails */}
-                  <div className="flex shrink-0 -space-x-3">
-                    {imgs.slice(0, 3).map((url, i) => (
-                      <div
-                        key={i}
-                        className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-white ring-1 ring-line"
-                        style={{ zIndex: 3 - i }}
+                {/* Whole top area opens the order */}
+                <Link href={href} className="block focus-visible:outline-none">
+                  <div className="grid grid-cols-1 items-center gap-4 p-[18px] sm:grid-cols-[auto_1fr_auto] sm:gap-6 sm:px-6 sm:py-[22px]">
+                    <OrderThumbs images={o.images} />
+                    <div className="min-w-0">
+                      <h2 className="m-0 mb-0.5 text-lg font-semibold text-charcoal">{o.product}</h2>
+                      <div className="text-sm text-muted">
+                        {o.quantity} magnet{o.quantity > 1 ? "s" : ""} · {formatDate(o.createdAt)}
+                        {o.paymentMethod === "cod" && " · Cash on delivery"}
+                      </div>
+                      <div className="mt-1 flex items-center gap-1.5 truncate text-[13.5px] text-muted">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 flex-none">
+                          <path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z" />
+                          <circle cx="12" cy="9.5" r="2.5" />
+                        </svg>
+                        <span className="truncate">
+                          {o.shippingAddress.fullName}, {o.shippingAddress.city}, {o.shippingAddress.state} – {o.shippingAddress.pincode}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between sm:block sm:text-right">
+                      <div className="text-[26px] font-bold leading-tight tracking-tight text-terracotta">
+                        {CURRENCY_SYMBOL}{o.total ?? o.amount}
+                      </div>
+                      <div className="sm:mt-1.5"><StatePill state={s} /></div>
+                    </div>
+                  </div>
+                  {s !== "cancelled" && (
+                    <div className="px-2.5 pb-[18px] sm:px-6 sm:pb-[22px]">
+                      <OrderTimeline order={o} compact />
+                    </div>
+                  )}
+                </Link>
+
+                {/* Footer: actions only while the order can still change */}
+                <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-line bg-cream/60 px-[18px] py-3.5 sm:px-6">
+                  <span className="min-w-[200px] flex-1 text-[13.5px] text-muted">{STATE_NOTE[s]}</span>
+                  <div className="flex w-full flex-wrap gap-2.5 sm:w-auto">
+                    {payable && (
+                      <button
+                        onClick={() => pay(o)}
+                        disabled={busyId === o._id}
+                        className={`${btn} flex-1 border-terracotta bg-terracotta text-onaccent hover:brightness-110 sm:flex-none`}
                       >
-                        <Image src={url} alt="" fill className="object-cover" sizes="80px" />
-                      </div>
-                    ))}
-                    {imgs.length > 3 && (
-                      <div className="grid h-20 w-20 place-items-center rounded-xl border-2 border-white bg-cream text-sm font-semibold text-charcoal ring-1 ring-line">
-                        +{imgs.length - 3}
-                      </div>
+                        {busyId === o._id ? "Processing…" : s === "failed" ? "Retry payment" : "Pay now"}
+                      </button>
                     )}
-                  </div>
-
-                  {/* Details */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-semibold text-charcoal">{order.product}</h2>
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${ORDER_STATUS_STYLES[order.status] ?? "bg-cream text-charcoal"}`}>
-                        {order.status}
-                      </span>
-                      <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize ${PAYMENT_STATUS_STYLES[order.paymentStatus] ?? "bg-cream text-charcoal"}`}>
-                        {order.paymentStatus}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted">
-                      {order.unitLabel} &bull;{" "}
-                      {new Date(order.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                    </p>
-                    <p className="mt-0.5 text-sm text-muted">
-                      {order.shippingAddress.fullName}, {order.shippingAddress.city},{" "}
-                      {order.shippingAddress.state} – {order.shippingAddress.pincode}
-                    </p>
-                    {isPaid && order.razorpayPaymentId && (
-                      <p className="mt-1 text-xs text-muted">
-                        Payment ID:{" "}
-                        <span className="font-mono text-charcoal">{order.razorpayPaymentId}</span>
-                      </p>
+                    {editable && (
+                      <Link href={`/orders/${o._id}/edit`} className={`${btn} flex-1 sm:flex-none`}>Edit</Link>
                     )}
-                    {isPaid && order.paidAt && (
-                      <p className="mt-0.5 text-xs text-muted">
-                        Paid on{" "}
-                        {new Date(order.paidAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                      </p>
+                    {editable && (
+                      <button
+                        onClick={() => cancel(o)}
+                        disabled={busyId === o._id}
+                        className={`${btn} flex-1 text-red-400 hover:border-red-400 hover:bg-red-500/10 sm:flex-none`}
+                      >
+                        Cancel
+                      </button>
                     )}
-                  </div>
-
-                  {/* Amount + actions */}
-                  <div className="flex flex-row items-center justify-between gap-4 sm:flex-col sm:items-end">
-                    <div className="text-right">
-                      <p className="text-xl font-extrabold text-terracotta">
-                        {CURRENCY_SYMBOL}{total}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-end gap-2">
-                      {/* Pay Now — shown for unpaid, non-cancelled orders */}
-                      {isUnpaid && !isCancelled && (
-                        <button
-                          onClick={() => handlePayNow(order)}
-                          disabled={payingId === order._id}
-                          className="flex items-center gap-1.5 rounded-full bg-terracotta px-4 py-2 text-xs font-bold text-onaccent shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60"
-                        >
-                          {payingId === order._id ? (
-                            <>
-                              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-                                <path className="opacity-90" d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                              </svg>
-                              Processing…
-                            </>
-                          ) : (
-                            <>💳 Pay Now</>
-                          )}
-                        </button>
-                      )}
-
-                      {/* Edit — only for pending + unpaid */}
-                      {isPending && isUnpaid && (
-                        <Link
-                          href={`/orders/${order._id}/edit`}
-                          className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold text-charcoal hover:bg-cream"
-                        >
-                          Edit
-                        </Link>
-                      )}
-
-                      {/* Cancel — only for pending + unpaid */}
-                      {isPending && isUnpaid && (
-                        <button
-                          onClick={() => handleCancel(order._id)}
-                          disabled={cancellingId === order._id}
-                          className="rounded-full border border-red-200 bg-red-500/10 px-4 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-100 disabled:opacity-50"
-                        >
-                          {cancellingId === order._id ? "Cancelling…" : "Cancel"}
-                        </button>
-                      )}
-                    </div>
+                    <Link href={href} className={`${btn} flex-1 sm:flex-none`}>View details</Link>
                   </div>
                 </div>
-
-                {/* Unpaid warning bar */}
-                {isUnpaid && !isCancelled && (
-                  <div className="flex items-center justify-between gap-3 rounded-b-2xl border-t border-terracotta/20 bg-terracotta/5 px-4 py-2.5 text-xs text-terracotta-dark">
-                    <span>⚠ Payment pending — your order will be confirmed once payment is complete.</span>
-                  </div>
-                )}
-              </div>
+              </article>
             );
           })}
         </div>
       )}
+
+      {/* Pagination */}
+      {!loading && pages > 1 && (
+        <nav className="mt-8 flex items-center justify-center gap-2" aria-label="Pagination">
+          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className={btn}>
+            ← Prev
+          </button>
+          {pageWindow(page, pages).map((n, i) =>
+            n === 0 ? (
+              <span key={`gap-${i}`} className="px-1 text-muted">…</span>
+            ) : (
+            <button
+              key={n}
+              onClick={() => setPage(n)}
+              aria-current={n === page ? "page" : undefined}
+              className={`h-10 w-10 rounded-xl border-[1.5px] text-sm font-semibold transition-colors ${
+                n === page ? "border-terracotta bg-terracotta text-onaccent" : "border-line text-charcoal hover:border-muted"
+              }`}
+            >
+              {n}
+            </button>
+            )
+          )}
+          <button onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page === pages} className={btn}>
+            Next →
+          </button>
+        </nav>
+      )}
     </div>
   );
+}
+
+// Page numbers to show: first, last, and the current page ±1, with 0 marking a gap.
+function pageWindow(page: number, pages: number): number[] {
+  if (pages <= 7) return Array.from({ length: pages }, (_, i) => i + 1);
+  const keep = new Set([1, pages, page - 1, page, page + 1]);
+  const out: number[] = [];
+  for (let n = 1; n <= pages; n++) {
+    if (keep.has(n)) out.push(n);
+    else if (out[out.length - 1] !== 0) out.push(0);
+  }
+  return out;
 }

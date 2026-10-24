@@ -191,13 +191,13 @@ export default function HomePage() {
       <PricingSection />
 
       {/* Refer & Earn */}
-      <section className="relative overflow-hidden py-8">
-        {/* Background blobs — only theme colors */}
+      {/* <section className="relative overflow-hidden py-8">
+ 
         <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-terracotta/10 blur-3xl" />
         <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-gold/15 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Header */}
+    
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="mt-5 text-3xl font-extrabold text-charcoal sm:text-4xl lg:text-5xl">
               Share the love,{" "}
@@ -211,7 +211,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Reward tier cards — all theme tokens */}
+   
           <div className="mt-14 grid gap-5 sm:grid-cols-3">
             {[
               {
@@ -259,7 +259,6 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* CTA block */}
           <div className="relative mt-14 overflow-hidden rounded-3xl border border-terracotta/40 bg-surface px-8 py-10 text-center sm:px-16">
             <p className="relative text-sm font-semibold uppercase tracking-widest text-terracotta">Ready to earn?</p>
             <h3 className="relative mt-2 text-2xl font-extrabold text-charcoal sm:text-3xl">
@@ -282,17 +281,13 @@ export default function HomePage() {
                 Create account first
               </Link>
             </div>
-            {/* <div className="relative mt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-white/50">
-              <span>✅ No minimum orders</span>
-              <span>✅ Instant wallet credit</span>
-              <span>✅ Share via WhatsApp</span>
-            </div> */}
+           
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Features */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+      {/* <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
         <div className="grid gap-8 md:grid-cols-3">
           {[
             {
@@ -315,7 +310,7 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* Reviews — full-height wall of love */}
       <div id="reviews" className="scroll-mt-20">

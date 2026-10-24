@@ -11,8 +11,8 @@ const NAV_LINKS = [
   { href: "/products/custom-magnets", label: "Custom Magnets" },
   { href: "/#how-it-works", label: "How It Works" },
   { href: "/#pricing", label: "Pricing" },
-  { href: "/blog", label: "Blog" },
-  { href: "/#reviews", label: "Reviews" },
+  // { href: "/blog", label: "Blog" },
+  // { href: "/#reviews", label: "Reviews" },
 ];
 
 export default function Navbar() {

@@ -101,7 +101,7 @@ export default function RootLayout({
           <Navbar />
           <main className="min-h-screen overflow-x-hidden">{children}</main>
           <Footer />
-          <WhatsAppFAB />
+          {/* <WhatsAppFAB /> */}
         </AuthProvider>
       </body>
     </html>

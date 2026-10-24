@@ -47,10 +47,9 @@ export default function RefundPolicyPage() {
       <Section heading="6. How to Request">
         <p>
           To request a cancellation or refund, contact us at{" "}
-          <a href="mailto:hello@swarnamaala.in" className="text-terracotta hover:underline">
-            hello@swarnamaala.in
-          </a>{" "}
-          or WhatsApp +91 90842 48821 with your order details.
+          <a href="mailto:swarnamaala.in@gmail.com" className="text-terracotta hover:underline">
+            swarnamaala.in@gmail.com          </a>{" "}
+          or WhatsApp +91 836 805 9837 with your order details.
         </p>
       </Section>
     </LegalPage>

@@ -8,8 +8,11 @@ import { isValidUploadUrl } from "@/lib/s3";
 import { Coupon } from "@/models/Coupon";
 import { evaluateCoupon, type CouponLike } from "@/lib/coupon";
 import { sendMail, orderConfirmationEmail } from "@/lib/mail";
+import { TABS, tabFilter } from "@/lib/orderView";
 
-export async function GET() {
+// Paginated list of the signed-in customer's orders, filtered by tab.
+// ?tab=all|pay|progress|delivered|cancelled&page=1&limit=5
+export async function GET(request: Request) {
   const session = await getSessionUser();
   if (!session) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
@@ -17,10 +20,32 @@ export async function GET() {
 
   try {
     await connectToDatabase();
-    const orders = await Order.find({ user: session.id })
-      .sort({ createdAt: -1 })
-      .lean();
-    return NextResponse.json({ orders });
+    const url = new URL(request.url);
+    const tab = url.searchParams.get("tab") ?? "all";
+    const limit = Math.min(20, Math.max(1, parseInt(url.searchParams.get("limit") ?? "5", 10) || 5));
+    const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1", 10) || 1);
+
+    const base = { user: session.id };
+    const filter = { ...base, ...tabFilter(tab) };
+
+    const [orders, total, ...counts] = await Promise.all([
+      Order.find(filter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-razorpaySignature")
+        .lean(),
+      Order.countDocuments(filter),
+      ...TABS.map((t) => Order.countDocuments({ ...base, ...tabFilter(t.key) })),
+    ]);
+
+    return NextResponse.json({
+      orders,
+      total,
+      page,
+      pages: Math.max(1, Math.ceil(total / limit)),
+      counts: Object.fromEntries(TABS.map((t, i) => [t.key, counts[i]])),
+    });
   } catch (err) {
     console.error("orders GET error", err);
     return NextResponse.json({ error: "Failed to load orders." }, { status: 500 });

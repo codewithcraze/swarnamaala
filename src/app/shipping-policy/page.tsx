@@ -16,13 +16,6 @@ export default function ShippingPolicyPage() {
           will be notified once your order is on its way.
         </p>
       </Section>
-      <Section heading="2. Same-Day Delivery">
-        <p>
-          We offer <span className="font-semibold text-charcoal">same-day delivery in Noida,
-          Delhi &amp; Ghaziabad</span> for orders confirmed early in the day, or within 24–48 hours
-          maximum.
-        </p>
-      </Section>
       <Section heading="3. Pan-India Shipping">
         <p>
           For the rest of India, delivery usually takes 3–7 business days depending on your
@@ -38,10 +31,10 @@ export default function ShippingPolicyPage() {
       <Section heading="5. Tracking & Support">
         <p>
           For delivery updates, contact us at{" "}
-          <a href="mailto:hello@swarnamaala.in" className="text-terracotta hover:underline">
-            hello@swarnamaala.in
+          <a href="mailto:swarnamaala.in@gmail.com" className="text-terracotta hover:underline">
+            swarnamaala.in@gmail.com
           </a>{" "}
-          or WhatsApp +91 90842 48821.
+          or WhatsApp +91 836 805 9837.
         </p>
       </Section>
     </LegalPage>

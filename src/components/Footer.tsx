@@ -16,8 +16,8 @@ export default function Footer() {
           </p>
           <p className="mt-4 text-sm text-white">
             <span className="font-semibold">WhatsApp:</span>{" "}
-            <a href="https://wa.me/919084248821" className="text-white hover:underline">
-              +91 90842 48821
+            <a href="https://wa.me/918368059837" className="text-white hover:underline">
+              +91 836 805 9837
             </a>
           </p>
         </div>

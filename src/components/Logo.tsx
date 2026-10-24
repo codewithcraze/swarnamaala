@@ -21,7 +21,7 @@ export default function Logo({
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center overflow-hidden rounded-xl bg-[#fbf6ef] shadow-sm ring-1 ring-terracotta/50"
+      className="flex items-center overflow-hidden rounded-xl "
       aria-label="swarnamaala.in home"
     >
       {/* The logo artwork has an ivory background, so it sits on an ivory

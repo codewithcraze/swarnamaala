@@ -38,15 +38,15 @@ export default function MagnetShowcase() {
             <span className="block text-terracotta">Strong magnetic back.</span>
           </h2>
           <p className="mt-4 max-w-md leading-relaxed text-muted">
-            Give it a moment and watch it turn. Your photo is printed edge-to-edge on a
-            premium glossy surface, backed by a full magnetic sheet that grips the fridge
-            firmly — no weak corners, no slipping.
+            Drag or swipe the magnet to turn it over and see both sides. Your photo is
+            printed edge-to-edge on a premium glossy surface, backed by a full magnetic
+            sheet that grips the fridge firmly — no weak corners, no slipping.
           </p>
           <ul className="mt-6 space-y-2 text-sm text-charcoal">
             {[
               "Rich, true-to-life colour printing",
               "Full-surface magnet, not just a dot",
-              "Rounded, scratch-resistant edges",
+              "Clean, precise-cut 90 × 65 mm size",
             ].map((f) => (
               <li key={f} className="flex items-center gap-2">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-terracotta">

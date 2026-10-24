@@ -61,6 +61,12 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
         return;
       }
       const o = data.order;
+      // Orders that are paid or already in progress are view-only: send the
+      // customer to the order details page instead of showing the edit form.
+      if (o.status !== "pending" || o.paymentStatus === "paid") {
+        router.replace(`/orders/${orderId}`);
+        return;
+      }
       setQuantity(o.quantity);
       setImages(Array.isArray(o.images) ? o.images : []);
       setNote(o.note ?? "");
@@ -79,7 +85,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
     } finally {
       setLoadingOrder(false);
     }
-  }, [orderId]);
+  }, [orderId, router]);
 
   useEffect(() => {
     if (authLoading) return;

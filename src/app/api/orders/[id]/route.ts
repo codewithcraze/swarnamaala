@@ -98,9 +98,14 @@ export async function PATCH(request: Request, { params }: Ctx) {
     if (!order) {
       return NextResponse.json({ error: "Order not found." }, { status: 404 });
     }
-    if (order.status !== EDITABLE_STATUS) {
+    if (order.status !== EDITABLE_STATUS || order.paymentStatus === "paid") {
       return NextResponse.json(
-        { error: `This order is already ${order.status} and can no longer be edited.` },
+        {
+          error:
+            order.paymentStatus === "paid"
+              ? "This order is already paid and can no longer be edited."
+              : `This order is already ${order.status} and can no longer be edited.`,
+        },
         { status: 409 }
       );
     }
@@ -159,9 +164,14 @@ export async function DELETE(_request: Request, { params }: Ctx) {
     if (!order) {
       return NextResponse.json({ error: "Order not found." }, { status: 404 });
     }
-    if (order.status !== EDITABLE_STATUS) {
+    if (order.status !== EDITABLE_STATUS || order.paymentStatus === "paid") {
       return NextResponse.json(
-        { error: `This order is already ${order.status} and can no longer be cancelled.` },
+        {
+          error:
+            order.paymentStatus === "paid"
+              ? "This order is already paid. Please contact us to cancel it."
+              : `This order is already ${order.status} and can no longer be cancelled.`,
+        },
         { status: 409 }
       );
     }

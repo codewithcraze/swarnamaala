@@ -7,7 +7,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import BannerCarousel from "@/components/BannerCarousel";
+import CustomerLove from "@/components/CustomerLove";
 import { openRazorpayCheckout } from "@/lib/razorpay";
+import { compressImage, uploadWithProgress, runLimited } from "@/lib/compressImage";
 import {
   PRICING_TIERS, getTier, computePricing, quantityLabel,
   CURRENCY_SYMBOL, EXTRA_MAGNET_PRICE, MAX_QUANTITY, COD_FEE,
@@ -15,6 +17,14 @@ import {
 } from "@/lib/pricing";
 
 type PaymentMethod = "online" | "cod";
+
+type PendingUpload = {
+  id: string;
+  preview: string; // local object URL, shown instantly
+  progress: number; // 0..1 upload progress
+  stage: "optimising" | "uploading";
+  file: File;
+};
 
 const PRODUCT_PATH = "/products/custom-magnets";
 
@@ -45,8 +55,13 @@ export default function ProductConfigurator() {
       : MIN_QUANTITY
   );
   const [images, setImages] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [pendingCount, setPendingCount] = useState(0);
+  // Photos still being optimised/uploaded, shown instantly from a local preview.
+  const [pending, setPending] = useState<PendingUpload[]>([]);
+  // Uploaded URL -> local preview, so finished photos display instantly instead
+  // of being downloaded again from the server.
+  const [localSrc, setLocalSrc] = useState<Record<string, string>>({});
+  const uploading = pending.length > 0;
+  const pendingCount = pending.length;
   const [note, setNote] = useState("");
   const [address, setAddress] = useState<Address>(EMPTY_ADDRESS);
   const [error, setError] = useState("");
@@ -123,13 +138,8 @@ export default function ProductConfigurator() {
     setQuantity(v);
   }
 
-  async function uploadFile(file: File): Promise<string> {
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error ?? "Upload failed");
-    return data.url as string;
+  function updatePending(id: string, patch: Partial<PendingUpload>) {
+    setPending((list) => list.map((p) => (p.id === id ? { ...p, ...patch } : p)));
   }
 
   async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
@@ -138,26 +148,48 @@ export default function ProductConfigurator() {
     if (files.length === 0) return;
     setError("");
     if (!user) { setNeedsLogin(true); return; }
-    const slots = quantity - images.length;
+    const slots = quantity - images.length - pending.length;
     if (slots <= 0) { setError(`All ${quantity} photos added.`); return; }
-    const toUpload = files.slice(0, slots);
-    setUploading(true);
-    setPendingCount(toUpload.length);
-    try {
-      const results = await Promise.allSettled(toUpload.map(uploadFile));
-      const urls = results
-        .filter((r): r is PromiseFulfilledResult<string> => r.status === "fulfilled")
-        .map((r) => r.value);
-      if (urls.length > 0) setImages((prev) => [...prev, ...urls].slice(0, quantity));
-      if (results.some((r) => r.status === "rejected"))
-        setError("Some photos failed to upload. Please try again.");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setUploading(false);
-      setPendingCount(0);
+
+    // Show every selected photo immediately from a local preview, then shrink
+    // and upload in the background, 3 at a time. Each photo moves into the grid
+    // as soon as it finishes instead of waiting for the whole batch.
+    const items: PendingUpload[] = files.slice(0, slots).map((file, i) => ({
+      id: `${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`,
+      preview: URL.createObjectURL(file),
+      progress: 0,
+      stage: "optimising",
+      file,
+    }));
+    setPending((list) => [...list, ...items]);
+
+    let failed = 0;
+    await runLimited(items, 3, async (item) => {
+      try {
+        const small = await compressImage(item.file);
+        updatePending(item.id, { stage: "uploading" });
+        const url = await uploadWithProgress(small, (f) => updatePending(item.id, { progress: f }));
+        setLocalSrc((m) => ({ ...m, [url]: item.preview }));
+        setImages((prev) => [...prev, url].slice(0, quantity));
+      } catch {
+        failed++;
+        URL.revokeObjectURL(item.preview);
+      } finally {
+        setPending((list) => list.filter((p) => p.id !== item.id));
+      }
+    });
+    if (failed > 0) {
+      setError(`${failed} ${failed === 1 ? "photo" : "photos"} failed to upload. Please try again.`);
     }
   }
+
+  // Free local previews when leaving the page.
+  const localSrcRef = useRef(localSrc);
+  localSrcRef.current = localSrc;
+  useEffect(() => () => Object.values(localSrcRef.current).forEach((u) => URL.revokeObjectURL(u)), []);
+
+  // Display source for an uploaded photo: the instant local preview if we have it.
+  const display = (url: string) => localSrc[url] ?? url;
 
   function removeImage(index: number) {
     setImages((prev) => prev.filter((_, i) => i !== index));
@@ -343,7 +375,7 @@ export default function ProductConfigurator() {
         </div>
       )}
 
-      <div className="lg:grid  lg:gap-10 lg:grid-cols-[1fr_min(450px,_40%)]">
+      <div className="lg:grid lg:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)]">
       {/* <div className="lg:grid"> */}
         {/* LEFT: product info + steps */}
         <div>
@@ -392,7 +424,7 @@ export default function ProductConfigurator() {
             {step === 1 && <Step1 quantity={quantity} setQuantity={setQuantity} isCustom={isCustom}
               setCustomQuantity={setCustomQuantity} pricing={pricing} />}
             {step === 2 && <Step2 quantity={quantity} images={images} uploading={uploading}
-              pendingCount={pendingCount} remaining={remaining} needsLogin={needsLogin}
+              pending={pending} display={display} remaining={remaining} needsLogin={needsLogin}
               user={!!user} loading={loading} fileRef={fileRef} openPicker={openPicker}
               removeImage={removeImage} useForAll={useForAll} handleFiles={handleFiles}
               clearAll={() => setImages([])} />}
@@ -435,8 +467,8 @@ export default function ProductConfigurator() {
         </div>
 
         {/* RIGHT: carousel (desktop sticky, hidden on mobile) */}
-        <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start">
-          <ProductImageCarousel images={images} quantity={quantity} uploading={uploading} />
+        <aside className="hidden min-w-0 lg:block lg:sticky lg:top-4 lg:self-start">
+          <ProductImageCarousel images={images.map(display)} quantity={quantity} uploading={uploading} />
           <div className="mt-4 rounded-2xl border border-line bg-cream/60 p-4 text-sm text-muted">
             <p className="font-semibold text-charcoal">Have questions?</p>
             <p className="mt-1">Chat with us on WhatsApp for instant help.</p>
@@ -518,15 +550,60 @@ function Step1({ quantity, setQuantity, isCustom, setCustomQuantity, pricing }: 
   );
 }
 
-function Step2({ quantity, images, uploading, pendingCount, remaining, needsLogin,
+// An uploaded photo tile: gold shimmer until the image has actually painted.
+function PhotoTile({ src, alt }: { src: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <>
+      {!loaded && <div className="shimmer absolute inset-0" />}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
+      />
+    </>
+  );
+}
+
+// A photo that is still being optimised / uploaded: its own preview, dimmed,
+// under a gold shimmer with a live progress bar.
+function PendingTile({ p }: { p: PendingUpload }) {
+  const pct = Math.round(p.progress * 100);
+  return (
+    <div className="shimmer relative aspect-square overflow-hidden rounded-xl border border-terracotta/30">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={p.preview} alt="" className="absolute inset-0 h-full w-full object-cover opacity-45 blur-[1px]" />
+      <div className="absolute inset-x-0 bottom-0 p-1.5">
+        <p className="mb-1 text-center text-[10px] font-semibold text-white drop-shadow">
+          {p.stage === "optimising" ? "Optimising…" : pct >= 100 ? "Finishing…" : `Uploading ${pct}%`}
+        </p>
+        <div className="h-1 overflow-hidden rounded-full bg-[#110d0a]/60">
+          <div
+            className="h-full rounded-full bg-terracotta transition-[width] duration-300"
+            style={{ width: `${p.stage === "optimising" ? 6 : Math.max(8, pct)}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Step2({ quantity, images, uploading, pending, display, remaining, needsLogin,
   user, loading, fileRef, openPicker, removeImage, useForAll, handleFiles, clearAll }: {
-  quantity: number; images: string[]; uploading: boolean; pendingCount: number;
+  quantity: number; images: string[]; uploading: boolean; pending: PendingUpload[];
+  display: (url: string) => string;
   remaining: number; needsLogin: boolean; user: boolean; loading: boolean;
   fileRef: React.RefObject<HTMLInputElement | null>; openPicker: () => void;
   removeImage: (i: number) => void; useForAll: (url: string) => void;
   handleFiles: (e: React.ChangeEvent<HTMLInputElement>) => void;
   clearAll: () => void;
 }) {
+  const [showPreview, setShowPreview] = useState(false);
+  const pendingCount = pending.length;
   return (
     <section>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -550,26 +627,41 @@ function Step2({ quantity, images, uploading, pendingCount, remaining, needsLogi
         </div>
       )}
 
-      {/* Mobile carousel preview */}
+      {/* Mobile: preview stays hidden until the customer asks for it. */}
       <div className="mt-4 lg:hidden">
-        <ProductImageCarousel images={images} quantity={quantity} uploading={uploading} />
+        <button
+          type="button"
+          onClick={() => setShowPreview((v) => !v)}
+          aria-expanded={showPreview}
+          className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-terracotta/40 bg-surface px-4 py-3 text-sm font-semibold text-charcoal transition-colors hover:border-terracotta"
+        >
+          <span className="flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-terracotta">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            {showPreview ? "Hide preview" : "Preview your magnets in 3D"}
+          </span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+            className={`text-muted transition-transform ${showPreview ? "rotate-180" : ""}`}>
+            <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        {showPreview && (
+          <div className="mt-3">
+            <ProductImageCarousel images={images.map(display)} quantity={quantity} uploading={uploading} />
+          </div>
+        )}
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-5">
         {Array.from({ length: quantity }).map((_, i) => {
           const url = images[i];
-          const isQueued = !url && i < images.length + pendingCount;
-          if (isQueued) return (
-            <div key={i} className="relative aspect-square overflow-hidden rounded-xl border border-line bg-cream">
-              <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-cream via-white to-cream" />
-              <div className="absolute inset-0 grid place-items-center">
-                <Spinner />
-              </div>
-            </div>
-          );
+          const queued = !url ? pending[i - images.length] : undefined;
+          if (queued) return <PendingTile key={queued.id} p={queued} />;
           if (url) return (
             <div key={i} className="group relative aspect-square overflow-hidden rounded-xl border-2 border-terracotta/30 bg-cream shadow-sm">
-              <Image src={url} alt={`Photo ${i + 1}`} fill className="object-cover" sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 120px" />
+              <PhotoTile src={display(url)} alt={`Photo ${i + 1}`} />
               <span className="absolute left-1 top-1 rounded-md bg-[#340d00]/65 px-1.5 py-0.5 text-[10px] font-medium text-white">#{i + 1}</span>
               <button type="button" onClick={() => removeImage(i)} aria-label={`Remove ${i + 1}`}
                 className="absolute right-1 top-1 grid h-6 w-6 cursor-pointer place-items-center rounded-md bg-[#340d00]/65 text-white hover:bg-red-600 transition-colors">
@@ -586,8 +678,8 @@ function Step2({ quantity, images, uploading, pendingCount, remaining, needsLogi
             </div>
           );
           return (
-            <button key={i} type="button" onClick={openPicker} disabled={uploading}
-              className="grid aspect-square cursor-pointer place-items-center rounded-xl border-2 border-dashed border-line bg-surface text-muted hover:border-terracotta/60 hover:text-terracotta disabled:opacity-60 transition-colors">
+            <button key={i} type="button" onClick={openPicker}
+              className="grid aspect-square cursor-pointer place-items-center rounded-xl border-2 border-dashed border-line bg-surface text-muted hover:border-terracotta/60 hover:text-terracotta transition-colors">
               <span className="text-center text-xs"><span className="block text-xl font-bold">+</span>Add</span>
             </button>
           );
@@ -595,7 +687,7 @@ function Step2({ quantity, images, uploading, pendingCount, remaining, needsLogi
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
-        <button type="button" onClick={openPicker} disabled={uploading || remaining <= 0}
+        <button type="button" onClick={openPicker} disabled={remaining - pendingCount <= 0}
           className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold text-charcoal hover:bg-cream disabled:opacity-50 transition-colors whitespace-nowrap">
           {uploading && <Spinner />}
           {uploading ? `Uploading ${pendingCount > 1 ? `${pendingCount} photos` : "photo"}…` : "📁 Upload photos"}
@@ -845,119 +937,17 @@ function Field({ label, className = "", children }: {
     </label>
   );
 }
-
 // ---- Customer Reviews Section ----
 
-const CUSTOMER_REVIEWS = [
-    {
-    name: "Alka Chaudhary",
-    location: "Dwarka, Delhi",
-    rating: 5,
-    text: "Print is good and magnet is too strong.",
-      verified: true,
-    photo: "/feedback/alka.jpeg"
-  },  {
-    name: "Shekhar & Suman",
-    location: "Bulandshahr",
-    rating: 5,
-    text: "Nice Magnets, Amazing product.",
-      verified: true,
-    photo: "/feedback/suman.jpeg"
-  },
-  {
-    name: "Priyanka Thankur",
-    location: "Greater Noida",
-    rating: 5,
-    text: "Very Nice, Product print is too good.",
-    photo: "/feedback/customer4.jpeg",
-    verified: true,
-  },
-   {
-    name: "Deepak Chaudhary",
-    location: "Noida",
-    rating: 5,
-    text: "Picture are so good. I asked them to create with different shapes and with resin work. Product deliverd is also good.",
-    photo: "/feedback/customer3.jpeg",
-    verified: true,
-  },
-  {
-    name: "Priya S.",
-    location: "Mumbai",
-    rating: 5,
-    text: "The print quality blew me away — colors are exactly like the original photo. Fridge looks so much happier now!",
-    photo: "/feedback/customer.png",
-    verified: true,
-  },
-  {
-    name: "Rohit K.",
-    location: "Bengaluru",
-    rating: 5,
-    text: "Ordered a 9-pack for my parents' anniversary. Packaging was solid and delivery was faster than expected.",
-    photo: "/feedback/customer2.png",
-    verified: true,
-  },
-   
-];
-
-function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
-  return (
-    <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} width={size} height={size} viewBox="0 0 24 24"
-          fill={i < Math.round(rating) ? "currentColor" : "none"}
-          stroke="currentColor" strokeWidth="1.5"
-          className={i < Math.round(rating) ? "text-[#F4B942]" : "text-line"}>
-          <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" strokeLinejoin="round" />
-        </svg>
-      ))}
-    </div>
-  );
-}
-
 function CustomerReviews() {
-  const avg = CUSTOMER_REVIEWS.reduce((s, r) => s + r.rating, 0) / CUSTOMER_REVIEWS.length;
   return (
     <section className="mt-16 border-t border-line pt-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-charcoal">Loved by 2,000+ happy customers</h2>
-          <div className="mt-1.5 flex items-center gap-2">
-            <Stars rating={avg} size={16} />
-            <span className="text-sm font-semibold text-charcoal">{avg.toFixed(1)}</span>
-            <span className="text-xs sm:text-sm text-muted">out of 5 · based on 500+ reviews</span>
-          </div>
-        </div>
-        <p className="text-xs sm:text-sm text-muted">Real photos from real orders — see the quality before you buy.</p>
-      </div>
-
-      <div className="mt-6 -mx-4 flex snap-x snap-mandatory gap-3 sm:gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-2">
-        {CUSTOMER_REVIEWS.map((r, i) => (
-          <div key={i} className="w-[75%] sm:w-auto shrink-0 snap-start overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
-            <div className="relative aspect-square w-full overflow-hidden bg-cream">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={r.photo} alt={`Magnets received by ${r.name}`} className="h-full w-full object-cover" loading="lazy" />
-              {r.verified && (
-                <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-surface/95 px-2 py-1 text-[10px] font-semibold text-terracotta shadow-sm">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                    <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  Verified buyer
-                </span>
-              )}
-            </div>
-            <div className="p-4">
-              <Stars rating={r.rating} size={13} />
-              <p className="mt-2 text-sm leading-relaxed text-charcoal">&ldquo;{r.text}&rdquo;</p>
-              <p className="mt-3 text-xs font-semibold text-muted">{r.name} <span className="font-normal">· {r.location}</span></p>
-            </div>
-          </div>
-        ))}
-      </div>
+      <CustomerLove />
 
       <div className="mt-8 grid grid-cols-1 xs:grid-cols-2 gap-3 rounded-2xl border border-line bg-cream/60 p-4 sm:p-5 sm:grid-cols-4">
         {[
           { label: "Free shipping", sub: "On all orders" },
-          { label: "Pay on delivery", sub: "No advance needed" },
+          { label: "Pay on delivery", sub: "No extra charge" },
           { label: "Made with care", sub: "Printed & packed by hand" },
           { label: "Easy returns", sub: "Damaged? We'll replace it" },
         ].map((b) => (
