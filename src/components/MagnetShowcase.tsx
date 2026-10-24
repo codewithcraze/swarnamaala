@@ -20,8 +20,12 @@ export default function MagnetShowcase() {
     <section className="relative overflow-hidden">
       <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-20">
         {/* 3D magnet — move your cursor (or finger) over it to tilt */}
-        <div ref={stageRef} className="relative h-[300px] sm:h-[400px] lg:h-[460px]">
-          {mounted && <MagnetScene image="/family.avif" active={visible} />}
+        {/* min-w-0 + absolute canvas: the canvas can never widen its grid column,
+            so the magnet stays centred on small screens. */}
+        <div ref={stageRef} className="relative h-[280px] w-full min-w-0 overflow-hidden sm:h-[400px] lg:h-[460px]">
+          <div className="absolute inset-0">
+            {mounted && <MagnetScene image="/family.avif" active={visible} />}
+          </div>
         </div>
 
         {/* Copy */}

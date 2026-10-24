@@ -110,7 +110,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative min-w-0">
             <MagnetHero />
           </div>
         </div>

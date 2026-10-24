@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { loadMagnetTexture } from "@/lib/magnetTexture";
 
@@ -20,6 +20,10 @@ function Magnet({
   reduced: boolean;
 }) {
   const group = useRef<THREE.Group>(null);
+  const { viewport } = useThree();
+  // Fit the magnet to the visible area with margin for the tilt, so it is
+  // always fully on screen and centred, from phones to desktop.
+  const fit = Math.min(1.25, viewport.width / (W * 1.45), viewport.height / (H * 1.9));
 
   useFrame((state) => {
     if (!group.current) return;
@@ -31,7 +35,7 @@ function Magnet({
   });
 
   return (
-    <group ref={group} scale={1.25}>
+    <group ref={group} scale={fit}>
       <mesh castShadow>
         <boxGeometry args={[W, H, D]} />
         <meshStandardMaterial color="#5a2d16" roughness={0.55} metalness={0.08} />
