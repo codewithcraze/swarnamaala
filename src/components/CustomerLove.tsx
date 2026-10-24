@@ -9,6 +9,8 @@ type Review = { name: string; city: string; text: string; photo: string; alt: st
 
 // Real reviews with the photos customers sent after delivery.
 const REVIEWS: Review[] = [
+  { name: "Kaur", city: "Delhi, Karol Bagh", text: "Product Qualtiy is top notch and print is very clear", photo: '/feedback/customer1.jpeg', alt: "fridge magnet"},
+  { name: "Sheetal", city: "Uttar Pradesh", text: "Very Nice Product", photo: '/feedback/customer2.jpeg', alt: "fridge magnet"},
   { name: "Alka Chaudhary", city: "Dwarka, Delhi", text: "Print is good and magnet is too strong.", photo: "/feedback/alka.jpeg", alt: "Baby photo magnets on a fridge" },
   { name: "Shekhar & Suman", city: "Bulandshahr", text: "Nice magnets, amazing product.", photo: "/feedback/suman.jpeg", alt: "Two portrait magnets on a fridge" },
   { name: "Priyanka Thakur", city: "Greater Noida", text: "Very nice, the print is too good.", photo: "/feedback/customer4.jpeg", alt: "Photo magnets received by Priyanka" },
