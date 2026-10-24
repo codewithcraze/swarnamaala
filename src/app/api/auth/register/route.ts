@@ -4,6 +4,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { createToken, setAuthCookie } from "@/lib/auth";
 import { generateUniqueReferralCode } from "@/lib/referral";
+import { sendMail, welcomeEmail } from "@/lib/mail";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -59,6 +60,12 @@ export async function POST(request: Request) {
 
     const token = await createToken({ id: user._id.toString(), name, email });
     await setAuthCookie(token);
+
+    // Send a welcome email (fire-and-forget; never blocks registration).
+    {
+      const { subject, html } = welcomeEmail({ name, referralCode });
+      void sendMail({ to: email, subject, html });
+    }
 
     return NextResponse.json({
       user: { id: user._id.toString(), name, email, phone },

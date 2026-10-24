@@ -7,6 +7,7 @@ import { computePricing, quantityLabel, referralReward, CURRENCY, COD_FEE } from
 import { isValidUploadUrl } from "@/lib/s3";
 import { Coupon } from "@/models/Coupon";
 import { evaluateCoupon, type CouponLike } from "@/lib/coupon";
+import { sendMail, orderConfirmationEmail } from "@/lib/mail";
 
 export async function GET() {
   const session = await getSessionUser();
@@ -146,6 +147,19 @@ export async function POST(request: Request) {
       referralReward: reward,
       referralCredited: false,
     });
+
+    // Send an order confirmation email (fire-and-forget).
+    if (session.email) {
+      const { subject, html } = orderConfirmationEmail({
+        name: session.name,
+        orderId: order._id.toString(),
+        quantity,
+        total: finalTotal,
+        currency: CURRENCY,
+        paymentMethod,
+      });
+      void sendMail({ to: session.email, subject, html });
+    }
 
     return NextResponse.json({
       order: {
