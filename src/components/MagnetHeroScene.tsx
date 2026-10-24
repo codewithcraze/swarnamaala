@@ -9,25 +9,25 @@ import { loadMagnetTexture } from "@/lib/magnetTexture";
 const D = 0.1;
 type Shape = "rect" | "square";
 // rect = 90mm x 65mm; square sized to sit nicely beside it.
-const SIZE: Record<Shape, [number, number]> = { rect: [1.8, 1.3], square: [1.45, 1.45] };
+const SIZE: Record<Shape, [number, number]> = { rect: [2.35, 1.7], square: [1.85, 1.85] };
 
 type Placement = { image: string; shape: Shape; x: number; y: number; rot: number; delay: number };
 
 // 3 columns x 3 rows (bottom row has two). Layout is centered on the origin so
 // the whole field can be scaled to fit any screen size.
 const PLACEMENTS: Placement[] = [
-  { image: "/family.avif", shape: "rect", x: -2.6, y: 1.9, rot: -0.08, delay: 0 },
-  { image: "/love.avif", shape: "square", x: 0, y: 2.0, rot: 0.05, delay: 0.12 },
-  { image: "/travel.avif", shape: "rect", x: 2.6, y: 1.85, rot: 0.1, delay: 0.24 },
-  { image: "/birthday.avif", shape: "square", x: -2.6, y: 0, rot: 0.07, delay: 0.36 },
+  { image: "/family.avif", shape: "rect", x: -2.65, y: 2.15, rot: -0.08, delay: 0 },
+  { image: "/love.avif", shape: "square", x: 0, y: 2.2, rot: 0.05, delay: 0.12 },
+  { image: "/travel.avif", shape: "rect", x: 2.65, y: 2.1, rot: 0.1, delay: 0.24 },
+  { image: "/birthday.avif", shape: "square", x: -2.65, y: 0, rot: 0.07, delay: 0.36 },
   { image: "/travel.avif", shape: "square", x: 0, y: -0.05, rot: -0.09, delay: 0.48 },
-  { image: "/family.avif", shape: "rect", x: 2.6, y: 0.05, rot: 0.04, delay: 0.6 },
-  { image: "/love.avif", shape: "rect", x: -1.3, y: -1.95, rot: 0.06, delay: 0.72 },
-  { image: "/birthday.avif", shape: "rect", x: 1.35, y: -1.9, rot: -0.05, delay: 0.84 },
+  { image: "/family.avif", shape: "rect", x: 2.65, y: 0.05, rot: 0.04, delay: 0.6 },
+  { image: "/love.avif", shape: "rect", x: -1.35, y: -2.15, rot: 0.06, delay: 0.72 },
+  { image: "/birthday.avif", shape: "rect", x: 1.4, y: -2.1, rot: -0.05, delay: 0.84 },
 ];
-// Size of the whole layout (plus breathing room), used to fit it to the canvas.
-const FIELD_W = 7.6;
-const FIELD_H = 5.9;
+// Size of the whole layout (plus a little breathing room), used to fit it to the canvas.
+const FIELD_W = 7.9;
+const FIELD_H = 6.4;
 
 // Overshoot-then-settle easing, so each magnet "snaps" onto the fridge.
 function easeOutBack(p: number) {
@@ -101,7 +101,7 @@ function Field({ textures, reduced }: { textures: THREE.Texture[]; reduced: bool
   const start = useRef<number | null>(null);
   const { viewport, camera } = useThree();
   // Scale the layout so it always fits the canvas (mobile through desktop).
-  const scale = Math.min(viewport.width / FIELD_W, viewport.height / FIELD_H, 1.15);
+  const scale = Math.min(viewport.width / FIELD_W, viewport.height / FIELD_H, 1.3);
 
   useFrame((state) => {
     if (start.current === null) start.current = state.clock.elapsedTime;

@@ -16,7 +16,7 @@ export default function MagnetHero() {
   const { mounted, visible } = useLazyMount(ref);
 
   return (
-    <div ref={ref} className="relative h-[320px] w-full min-w-0 overflow-hidden sm:h-[420px] lg:h-[540px]">
+    <div ref={ref} className="relative h-[360px] w-full min-w-0 overflow-hidden sm:h-[480px] lg:h-[600px]">
       <div className="absolute inset-0">
         {mounted && <MagnetHeroScene active={visible} />}
       </div>
