@@ -26,6 +26,7 @@ export const TABS = [
 export type TabKey = (typeof TABS)[number]["key"];
 
 export const isCod = (o: OrderLike) => o.paymentMethod === "cod";
+export const isMarketplace = (o: OrderLike) => o.paymentMethod === "marketplace";
 
 export function viewState(o: OrderLike): ViewState {
   if (o.status === "cancelled") return "cancelled";
@@ -62,7 +63,13 @@ export type Step = { label: string; state: "done" | "cur" | "bad" | "todo" };
 // Timeline: Placed → Payment → Printing → Shipped → Delivered.
 export function timeline(o: OrderLike): Step[] {
   const s = viewState(o);
-  const labels = ["Order placed", isCod(o) ? "Cash on delivery" : "Payment", "Printing", "Shipped", "Delivered"];
+  const labels = [
+    isMarketplace(o) ? "Photos received" : "Order placed",
+    isCod(o) ? "Cash on delivery" : isMarketplace(o) ? "Paid on platform" : "Payment",
+    "Printing",
+    "Shipped",
+    "Delivered",
+  ];
   // Index of the last completed step.
   const reached: Record<ViewState, number> = {
     unpaid: 0, failed: 0, cancelled: 0, confirmed: 1, printing: 2, shipped: 3, delivered: 4,

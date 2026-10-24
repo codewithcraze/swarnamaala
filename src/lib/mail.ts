@@ -121,3 +121,48 @@ export function orderConfirmationEmail({
   `);
   return { subject, html };
 }
+
+const esc = (s: string) =>
+  String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
+// Sent when photos arrive for a marketplace (Meesho/Flipkart/…) order. If an
+// account was created for the customer, it includes their sign-in details.
+export function marketplaceOrderEmail({
+  name,
+  email,
+  platform,
+  externalOrderId,
+  quantity,
+  password,
+  siteUrl,
+}: {
+  name: string;
+  email: string;
+  platform: string;
+  externalOrderId: string;
+  quantity: number;
+  password?: string;
+  siteUrl: string;
+}): { subject: string; html: string } {
+  const subject = `We've received your photos for ${platform} order ${externalOrderId}`;
+  const account = password
+    ? `
+    <p>We've created a ${BRAND} account for you so you can track this order:</p>
+    <table style="width:100%;border-collapse:collapse;margin:12px 0;background:#faf6ef;border-radius:6px">
+      <tr><td style="padding:8px 12px;color:#666">Email</td><td style="padding:8px 12px;text-align:right"><strong>${esc(email)}</strong></td></tr>
+      <tr><td style="padding:8px 12px;color:#666">Password</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-size:15px"><strong>${esc(password)}</strong></td></tr>
+    </table>
+    <p><a href="${siteUrl}/signin" style="color:#8c6a22">Sign in here</a> and change your password after signing in. Keep this email private.</p>`
+    : `<p>You can track it anytime by <a href="${siteUrl}/signin" style="color:#8c6a22">signing in</a> with ${esc(email)}.</p>`;
+  const html = SHELL(`
+    <p>Hi ${esc(name) || "there"},</p>
+    <p>Thank you! We've received your photos and will start printing your magnets.</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+      <tr><td style="padding:6px 0;color:#666">Platform</td><td style="padding:6px 0;text-align:right">${esc(platform)}</td></tr>
+      <tr><td style="padding:6px 0;color:#666">Order ID</td><td style="padding:6px 0;text-align:right"><strong>${esc(externalOrderId)}</strong></td></tr>
+      <tr><td style="padding:6px 0;color:#666">Photos</td><td style="padding:6px 0;text-align:right">${quantity}</td></tr>
+    </table>
+    ${account}
+  `);
+  return { subject, html };
+}

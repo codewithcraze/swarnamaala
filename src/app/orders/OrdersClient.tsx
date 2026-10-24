@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import Confetti from "@/components/Confetti";
 import { OrderThumbs, OrderTimeline, StatePill, formatDate } from "@/components/OrderParts";
 import { CURRENCY_SYMBOL } from "@/lib/pricing";
+import { platformLabel } from "@/lib/platforms";
 import { payOrder } from "@/lib/payOrder";
 import { TABS, type TabKey, viewState, needsPayment, canEdit, STATE_NOTE } from "@/lib/orderView";
 
@@ -22,7 +23,9 @@ type Order = {
   paymentStatus: string;
   paymentMethod?: string;
   createdAt: string;
-  shippingAddress: { fullName: string; city: string; state: string; pincode: string };
+  source?: string;
+  externalOrderId?: string;
+  shippingAddress?: { fullName: string; city: string; state: string; pincode: string };
 };
 
 const PAGE_SIZE = 5;
@@ -232,13 +235,15 @@ export default function OrdersClient() {
                           <circle cx="12" cy="9.5" r="2.5" />
                         </svg>
                         <span className="truncate">
-                          {o.shippingAddress.fullName}, {o.shippingAddress.city}, {o.shippingAddress.state} – {o.shippingAddress.pincode}
+                          {o.shippingAddress
+                            ? `${o.shippingAddress.fullName}, ${o.shippingAddress.city}, ${o.shippingAddress.state} – ${o.shippingAddress.pincode}`
+                            : `Ships via ${platformLabel(o.source)} · order ${o.externalOrderId ?? ""}`}
                         </span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between sm:block sm:text-right">
                       <div className="text-[26px] font-bold leading-tight tracking-tight text-terracotta">
-                        {CURRENCY_SYMBOL}{o.total ?? o.amount}
+                        {o.paymentMethod === "marketplace" ? platformLabel(o.source) : `${CURRENCY_SYMBOL}${o.total ?? o.amount}`}
                       </div>
                       <div className="sm:mt-1.5"><StatePill state={s} /></div>
                     </div>

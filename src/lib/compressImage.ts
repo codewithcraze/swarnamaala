@@ -49,10 +49,15 @@ export async function compressImage(file: File): Promise<File> {
 
 // Uploads one file to /api/upload with real progress (fetch can't report upload
 // progress, XHR can). Resolves to the stored image URL.
-export function uploadWithProgress(file: File, onProgress: (fraction: number) => void): Promise<string> {
+export function uploadWithProgress(
+  file: File,
+  onProgress: (fraction: number) => void,
+  token?: string
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "/api/upload");
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
     xhr.responseType = "json";
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) onProgress(e.loaded / e.total);

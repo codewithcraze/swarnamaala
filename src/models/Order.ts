@@ -38,8 +38,14 @@ const OrderSchema = new Schema(
     discount: { type: Number, default: 0, min: 0 },
 
     // Payment method chosen at checkout.
-    // "online" -> paid via Razorpay; "cod" -> pay on delivery (+ codFee).
-    paymentMethod: { type: String, enum: ["online", "cod"], default: "online" },
+    // "online" -> paid via Razorpay; "cod" -> pay on delivery (+ codFee);
+    // "marketplace" -> already paid on the selling platform (Meesho, Flipkart…).
+    paymentMethod: { type: String, enum: ["online", "cod", "marketplace"], default: "online" },
+
+    // Where the order came from. Marketplace orders also store the platform's
+    // own order id so they can be matched up and never submitted twice.
+    source: { type: String, default: "website", index: true },
+    externalOrderId: { type: String, trim: true, uppercase: true },
     codFee: { type: Number, default: 0, min: 0 },
 
     images: {
@@ -51,7 +57,13 @@ const OrderSchema = new Schema(
       },
     },
     note: { type: String, trim: true },
-    shippingAddress: { type: ShippingAddressSchema, required: true },
+    // Required for website orders; marketplace orders ship via the platform.
+    shippingAddress: {
+      type: ShippingAddressSchema,
+      required: function (this: { source?: string }) {
+        return !this.source || this.source === "website";
+      },
+    },
     status: {
       type: String,
       enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
@@ -82,8 +94,21 @@ const OrderSchema = new Schema(
   { timestamps: true }
 );
 
+// One submission per platform order id (website orders have no externalOrderId).
+OrderSchema.index(
+  { source: 1, externalOrderId: 1 },
+  { unique: true, partialFilterExpression: { externalOrderId: { $type: "string" } } }
+);
+
 export type OrderDoc = InferSchemaType<typeof OrderSchema> & {
   _id: mongoose.Types.ObjectId;
 };
+
+// In development, hot reload keeps the previously compiled model in memory, so
+// schema changes (new fields/enums) would be ignored until a restart. Drop the
+// cached model so the current schema is always used.
+if (process.env.NODE_ENV !== "production" && models.Order) {
+  mongoose.deleteModel("Order");
+}
 
 export const Order = models.Order || model("Order", OrderSchema);

@@ -4,11 +4,13 @@ import path from "path";
 import crypto from "crypto";
 import { getSessionUser } from "@/lib/auth";
 import { s3Configured, uploadToS3 } from "@/lib/s3";
+import { bearerToken, verifyUploadToken } from "@/lib/marketplace";
 
 // mongoose / aws-sdk need the Node.js runtime (not edge), and image uploads
 // can take a little longer than the default limit.
 export const runtime = "nodejs";
 export const maxDuration = 120; // large images can take time
+const MAX_BYTES = 15 * 1024 * 1024;
 
 const ALLOWED = new Map<string, string>([
   ["image/jpeg", "jpg"],
@@ -18,9 +20,11 @@ const ALLOWED = new Map<string, string>([
 ]);
 
 export async function POST(request: Request) {
-  // Only signed-in users can upload (uploads are tied to placing an order).
+  // Uploads are tied to placing an order: allow signed-in users, or guests
+  // holding a marketplace upload token (Meesho/Flipkart photo page).
   const session = await getSessionUser();
-  if (!session) {
+  const guest = session ? null : await verifyUploadToken(bearerToken(request));
+  if (!session && !guest) {
     return NextResponse.json({ error: "Please sign in to upload an image." }, { status: 401 });
   }
 
@@ -38,6 +42,10 @@ export async function POST(request: Request) {
         { error: "Unsupported file type. Please upload a JPG, PNG or WebP image." },
         { status: 415 }
       );
+    }
+
+    if (file.size > MAX_BYTES) {
+      return NextResponse.json({ error: "That photo is too large (max 15 MB)." }, { status: 413 });
     }
 
     const bytes = Buffer.from(await file.arrayBuffer());

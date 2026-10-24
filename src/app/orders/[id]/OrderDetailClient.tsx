@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { OrderTimeline, StatePill, formatDate } from "@/components/OrderParts";
 import { CURRENCY_SYMBOL } from "@/lib/pricing";
+import { platformLabel } from "@/lib/platforms";
 import { payOrder } from "@/lib/payOrder";
 import { viewState, needsPayment, canEdit, STATE_NOTE } from "@/lib/orderView";
 
@@ -28,7 +29,9 @@ type Order = {
   razorpayPaymentId?: string;
   paidAt?: string;
   createdAt: string;
-  shippingAddress: {
+  source?: string;
+  externalOrderId?: string;
+  shippingAddress?: {
     fullName: string; phone: string; line1: string; line2?: string;
     city: string; state: string; pincode: string;
   };
@@ -196,6 +199,19 @@ export default function OrderDetailClient({ id }: { id: string }) {
 
         {/* Summary */}
         <aside className="grid content-start gap-5">
+          {order.paymentMethod === "marketplace" ? (
+            <section className="rounded-[22px] border border-line bg-surface p-5 sm:p-6">
+              <h2 className="mb-4 text-base font-semibold text-charcoal">Summary</h2>
+              <dl className="grid gap-2.5 text-sm">
+                <Row label="Bought on" value={platformLabel(order.source)} />
+                <Row label="Platform order ID" value={order.externalOrderId ?? "—"} />
+                <Row label="Magnets" value={String(order.quantity)} />
+              </dl>
+              <p className="mt-4 text-[13px] text-muted">
+                Paid on {platformLabel(order.source)}. It ships through {platformLabel(order.source)}, so track delivery in their app.
+              </p>
+            </section>
+          ) : (
           <section className="rounded-[22px] border border-line bg-surface p-5 sm:p-6">
             <h2 className="mb-4 text-base font-semibold text-charcoal">Summary</h2>
             <dl className="grid gap-2.5 text-sm">
@@ -217,7 +233,9 @@ export default function OrderDetailClient({ id }: { id: string }) {
               <p className="mt-1 break-all font-mono text-[12px] text-muted">{order.razorpayPaymentId}</p>
             )}
           </section>
+          )}
 
+          {a && (
           <section className="rounded-[22px] border border-line bg-surface p-5 sm:p-6">
             <h2 className="mb-3 text-base font-semibold text-charcoal">Shipping to</h2>
             <p className="text-sm text-charcoal">{a.fullName}</p>
@@ -230,6 +248,7 @@ export default function OrderDetailClient({ id }: { id: string }) {
               {a.phone}
             </p>
           </section>
+          )}
 
           {(payable || editable) && (
             <section className="grid gap-2.5">
