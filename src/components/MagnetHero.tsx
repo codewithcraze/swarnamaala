@@ -1,22 +1,23 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useRef } from "react";
+import { useLazyMount } from "@/lib/useLazyMount";
 
-// Browser-only WebGL scene — load on the client to avoid SSR issues.
+// Browser-only WebGL scene. No placeholder box — the magnets simply fly in
+// once the scene is ready, so there is no background or border.
 const MagnetHeroScene = dynamic(() => import("./MagnetHeroScene"), {
   ssr: false,
-  loading: () => (
-    <div className="grid h-full w-full place-items-center">
-      <div className="h-48 w-48 animate-pulse rounded-2xl bg-terracotta/15" />
-    </div>
-  ),
+  loading: () => null,
 });
 
 export default function MagnetHero() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { mounted, visible } = useLazyMount(ref);
+
   return (
-    <div className="relative h-[360px] w-full sm:h-[440px] lg:h-[520px]">
-      <div className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-gold/10 blur-3xl" />
-      <MagnetHeroScene />
+    <div ref={ref} className="relative h-[320px] w-full sm:h-[420px] lg:h-[540px]">
+      {mounted && <MagnetHeroScene active={visible} />}
     </div>
   );
 }

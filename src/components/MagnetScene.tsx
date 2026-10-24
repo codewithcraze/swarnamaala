@@ -1,69 +1,74 @@
 "use client";
 
-import { Suspense, useRef, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useTexture, Environment, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
+import { loadMagnetTexture } from "@/lib/magnetTexture";
 
-// Real magnet dimensions: 90mm x 65mm, flat. We model it to scale (in cm) as a
-// plain rectangular slab with SHARP corners and edges — no rounding, no bevel.
-const W = 1.8; // 90mm
-const H = 1.3; // 65mm
-const D = 0.12; // thin slab
+// Real magnet: 90mm x 65mm flat slab with sharp corners and edges.
+const W = 1.8;
+const H = 1.3;
+const D = 0.12;
 
-// Pointer position over the stage, shared so the slab tilts toward the cursor.
-function Magnet({ image, pointer }: { image: string; pointer: React.MutableRefObject<{ x: number; y: number }> }) {
+function Magnet({
+  tex,
+  pointer,
+  reduced,
+}: {
+  tex: THREE.Texture;
+  pointer: React.RefObject<{ x: number; y: number }>;
+  reduced: boolean;
+}) {
   const group = useRef<THREE.Group>(null);
-  const texture = useTexture(image);
-  texture.colorSpace = THREE.SRGBColorSpace;
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!group.current) return;
     const t = state.clock.elapsedTime;
-    // Target tilt from the pointer; gentle idle sway when the cursor is centered.
-    const targetY = pointer.current.x * 0.6 + Math.sin(t * 0.5) * 0.08;
-    const targetX = -pointer.current.y * 0.4 + Math.sin(t * 0.4) * 0.04;
-    // Ease toward the target for a smooth, weighty feel.
-    group.current.rotation.y += (targetY - group.current.rotation.y) * Math.min(1, delta * 6);
-    group.current.rotation.x += (targetX - group.current.rotation.x) * Math.min(1, delta * 6);
-    group.current.position.y = Math.sin(t * 1.1) * 0.03;
+    // Same feel as the template: gentle idle sway + tilt toward the pointer.
+    group.current.rotation.y = (reduced ? 0 : Math.sin(t * 0.8) * 0.2) + pointer.current.x * 0.5;
+    group.current.rotation.x = -pointer.current.y * 0.35 + (reduced ? 0 : Math.sin(t * 0.6) * 0.04);
+    group.current.position.y = reduced ? 0 : Math.sin(t * 1.1) * 0.05;
   });
 
   return (
-    <group ref={group}>
-      {/* The slab body — sharp rectangular box (90x65mm). Side faces are the
-          brown edge of the magnet. */}
+    <group ref={group} scale={1.25}>
       <mesh castShadow>
         <boxGeometry args={[W, H, D]} />
         <meshStandardMaterial color="#5a2d16" roughness={0.55} metalness={0.08} />
       </mesh>
-
-      {/* Glossy printed photo on the FRONT face */}
+      {/* Glossy photo front */}
       <mesh position={[0, 0, D / 2 + 0.001]}>
         <planeGeometry args={[W, H]} />
-        <meshStandardMaterial map={texture} roughness={0.22} metalness={0.04} />
+        <meshStandardMaterial map={tex} roughness={0.22} metalness={0.04} />
       </mesh>
-
-      {/* Brown magnetic sheet on the BACK face */}
+      {/* Brown magnetic back */}
       <mesh position={[0, 0, -D / 2 - 0.001]} rotation={[0, Math.PI, 0]}>
         <planeGeometry args={[W, H]} />
         <meshStandardMaterial color="#3a1c0d" roughness={0.9} metalness={0.15} />
-      </mesh>
-      {/* Magnetic strip detail on the back */}
-      <mesh position={[0, 0, -D / 2 - 0.002]} rotation={[0, Math.PI, 0]}>
-        <planeGeometry args={[W * 0.78, H * 0.26]} />
-        <meshStandardMaterial color="#1f0f07" roughness={0.95} />
       </mesh>
     </group>
   );
 }
 
-export default function MagnetScene({ image = "/family.avif" }: { image?: string }) {
+export default function MagnetScene({ image = "/family.avif", active = true }: { image?: string; active?: boolean }) {
   const pointer = useRef({ x: 0, y: 0 });
+  const [tex, setTex] = useState<THREE.Texture | null>(null);
+  const reduced = useMemo(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    []
+  );
+
+  useEffect(() => {
+    let alive = true;
+    loadMagnetTexture(image, W / H)
+      .then((t) => alive && setTex(t))
+      .catch((err) => console.warn("[magnet] texture load failed", err));
+    return () => {
+      alive = false;
+    };
+  }, [image]);
 
   function onMove(e: ReactPointerEvent<HTMLDivElement>) {
-    // The Canvas renders into an HTML element, so this is a DOM pointer event.
-    // Convert client coords to normalized device coords (-1..1) over the canvas.
     const rect = e.currentTarget.getBoundingClientRect();
     pointer.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.current.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
@@ -76,20 +81,22 @@ export default function MagnetScene({ image = "/family.avif" }: { image?: string
   return (
     <Canvas
       shadows
-      dpr={[1, 2]}
-      camera={{ position: [0, 0.2, 3.6], fov: 42 }}
-      gl={{ antialias: true, alpha: true }}
+      dpr={[1, 1.5]}
+      frameloop={active ? "always" : "never"}
+      camera={{ position: [0, 0.2, 4.2], fov: 40 }}
+      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      style={{ touchAction: "pan-y" }}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
     >
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[3, 4, 5]} intensity={1.1} castShadow />
-      <directionalLight position={[-3, 2, -4]} intensity={0.4} color="#f4b942" />
-      <Suspense fallback={null}>
-        <Magnet image={image} pointer={pointer} />
-        <Environment preset="apartment" />
-      </Suspense>
-      <ContactShadows position={[0, -1, 0]} opacity={0.35} scale={5} blur={2.5} far={2.5} color="#3a1c0d" />
+      <hemisphereLight intensity={1.0} color="#ffffff" groundColor="#d9c9ba" />
+      <directionalLight position={[2, 5, 4]} intensity={0.9} castShadow shadow-mapSize={[1024, 1024]} />
+      {tex && <Magnet tex={tex} pointer={pointer} reduced={reduced} />}
+      {/* Invisible floor that only shows the soft shadow — no background. */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.1, 0]} receiveShadow>
+        <planeGeometry args={[12, 12]} />
+        <shadowMaterial opacity={0.16} />
+      </mesh>
     </Canvas>
   );
 }

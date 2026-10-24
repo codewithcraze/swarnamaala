@@ -2,26 +2,26 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRef } from "react";
 import { CURRENCY_SYMBOL } from "@/lib/pricing";
+import { useLazyMount } from "@/lib/useLazyMount";
 
 // The WebGL scene is heavy and browser-only, so load it on the client only.
 const MagnetScene = dynamic(() => import("./MagnetScene"), {
   ssr: false,
-  loading: () => (
-    <div className="grid h-full w-full place-items-center">
-      <div className="h-40 w-40 animate-pulse rounded-2xl bg-terracotta/15" />
-    </div>
-  ),
+  loading: () => null,
 });
 
 export default function MagnetShowcase() {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const { mounted, visible } = useLazyMount(stageRef);
+
   return (
     <section className="relative overflow-hidden">
       <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-20">
-        {/* 3D magnet */}
-        <div className="relative order-1 h-[320px] sm:h-[400px] lg:order-none lg:h-[460px]">
-          <div className="pointer-events-none absolute inset-0 -z-10 mx-auto my-auto h-64 w-64 rounded-full bg-gold/15 blur-3xl" />
-          <MagnetScene image="/family.avif" />
+        {/* 3D magnet — move your cursor (or finger) over it to tilt */}
+        <div ref={stageRef} className="relative h-[300px] sm:h-[400px] lg:h-[460px]">
+          {mounted && <MagnetScene image="/family.avif" active={visible} />}
         </div>
 
         {/* Copy */}

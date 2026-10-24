@@ -42,7 +42,7 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-10 sm:px-6 md:grid-cols-2 py-10">
+        <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 md:gap-12 md:grid-cols-2 md:py-10">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#340d00]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#340d00]" />
