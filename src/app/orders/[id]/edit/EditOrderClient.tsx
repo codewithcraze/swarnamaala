@@ -342,14 +342,14 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                       className="group relative aspect-square overflow-hidden rounded-xl border border-line bg-cream"
                     >
                       <Image src={url} alt={`Photo ${i + 1}`} fill className="object-cover" sizes="120px" />
-                      <span className="absolute left-1 top-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                      <span className="absolute left-1 top-1 rounded-md bg-[#340d00]/65 px-1.5 py-0.5 text-[10px] font-medium text-white">
                         #{i + 1}
                       </span>
                       <button
                         type="button"
                         onClick={() => removeImage(i)}
                         aria-label={`Remove photo ${i + 1}`}
-                        className="absolute right-1 top-1 grid h-6 w-6 cursor-pointer place-items-center rounded-md bg-black/60 text-white transition-colors hover:bg-red-600"
+                        className="absolute right-1 top-1 grid h-6 w-6 cursor-pointer place-items-center rounded-md bg-[#340d00]/65 text-white transition-colors hover:bg-red-600"
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                           <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
@@ -359,7 +359,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                         <button
                           type="button"
                           onClick={() => useForAll(url)}
-                          className="absolute inset-x-0 bottom-0 cursor-pointer bg-black/65 py-1 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100"
+                          className="absolute inset-x-0 bottom-0 cursor-pointer bg-[#340d00]/75 py-1 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100"
                         >
                           Use for all
                         </button>

@@ -66,7 +66,7 @@ export default function ProductImageCarousel({
         )}
 
         {/* Slot badge */}
-        <span className="absolute left-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white">
+        <span className="absolute left-3 top-3 rounded-full bg-[#340d00]/65 px-3 py-1 text-xs font-semibold text-white">
           {safeActive + 1} / {slots.length}
         </span>
 

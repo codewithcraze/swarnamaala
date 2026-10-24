@@ -570,16 +570,16 @@ function Step2({ quantity, images, uploading, pendingCount, remaining, needsLogi
           if (url) return (
             <div key={i} className="group relative aspect-square overflow-hidden rounded-xl border-2 border-terracotta/30 bg-cream shadow-sm">
               <Image src={url} alt={`Photo ${i + 1}`} fill className="object-cover" sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 120px" />
-              <span className="absolute left-1 top-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">#{i + 1}</span>
+              <span className="absolute left-1 top-1 rounded-md bg-[#340d00]/65 px-1.5 py-0.5 text-[10px] font-medium text-white">#{i + 1}</span>
               <button type="button" onClick={() => removeImage(i)} aria-label={`Remove ${i + 1}`}
-                className="absolute right-1 top-1 grid h-6 w-6 cursor-pointer place-items-center rounded-md bg-black/60 text-white hover:bg-red-600 transition-colors">
+                className="absolute right-1 top-1 grid h-6 w-6 cursor-pointer place-items-center rounded-md bg-[#340d00]/65 text-white hover:bg-red-600 transition-colors">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
                 </svg>
               </button>
               {quantity > 1 && (
                 <button type="button" onClick={() => useForAll(url)}
-                  className="absolute inset-x-0 bottom-0 bg-black/65 py-1 text-[10px] font-medium text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                  className="absolute inset-x-0 bottom-0 bg-[#340d00]/75 py-1 text-[10px] font-medium text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
                   Use for all
                 </button>
               )}
@@ -696,7 +696,9 @@ function PaymentMethodStep({ paymentMethod, setPaymentMethod, codFee }: {
           />
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-charcoal text-sm sm:text-base">Cash on Delivery</p>
-            <p className="text-xs text-muted">Pay when you receive · {CURRENCY_SYMBOL}{codFee} handling charge</p>
+            <p className="text-xs text-muted">
+              Pay when you receive · {codFee > 0 ? `${CURRENCY_SYMBOL}${codFee} handling charge` : "no extra charge"}
+            </p>
           </div>
         </label>
       </div>
@@ -770,7 +772,7 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
         </div>
       )}
 
-      {isCod && (
+      {isCod && codFee > 0 && (
         <div className="mt-2 sm:mt-3 flex items-center justify-between text-xs sm:text-sm">
           <span className="text-muted">COD handling</span>
           <span className="font-medium text-charcoal">+{CURRENCY_SYMBOL}{codFee}</span>

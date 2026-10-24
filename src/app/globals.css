@@ -85,6 +85,47 @@ body {
   animation: floaty 6s ease-in-out infinite;
 }
 
+/* Vertical marquee used by the testimonial wall. Each track holds the column's
+   cards duplicated twice, so translating by -50% loops seamlessly. */
+@keyframes marquee-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+@keyframes marquee-down {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.marquee-track {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  will-change: transform;
+}
+.marquee-up {
+  animation: marquee-up var(--marquee-duration, 40s) linear infinite;
+}
+.marquee-down {
+  animation: marquee-down var(--marquee-duration, 40s) linear infinite;
+}
+/* Pause the scroll while a visitor is reading a column. */
+.marquee-col:hover .marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-up,
+  .marquee-down {
+    animation: none;
+  }
+}
+
 /* Blog article content (HTML from the editor) */
 .prose {
   color: var(--color-charcoal);

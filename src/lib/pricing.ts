@@ -28,8 +28,8 @@ export const BASE_PACK_PRICE = 699;
 // reference stays valid without adding tax.
 export const GST_RATE = 0;
 
-// Flat fee added for Cash on Delivery orders. Online payments have no fee.
-export const COD_FEE = 49;
+// Cash on Delivery has no extra charge — same price as online payment.
+export const COD_FEE = 0;
 
 // Customers can order up to 50 magnets in a single order.
 export const MAX_QUANTITY = 50;

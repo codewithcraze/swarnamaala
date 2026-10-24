@@ -2,7 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { PRICING_TIERS, CURRENCY_SYMBOL, EXTRA_MAGNET_PRICE } from "@/lib/pricing";
 import { REVIEWS, AVERAGE_RATING } from "@/lib/reviews";
-import Reviews from "@/components/Reviews";
+import TestimonialWall from "@/components/TestimonialWall";
+import MagnetShowcase from "@/components/MagnetShowcase";
+import MagnetHero from "@/components/MagnetHero";
 
 import {HighQualityPrint, StrongMagnetIcon, Packageing, Fire, BestPrice, First, Second} from '@/components/svg';
 
@@ -109,32 +111,13 @@ export default function HomePage() {
           </div>
 
           <div className="relative">
-            <div className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-gold/10 blur-3xl" />
-            <div className="grid grid-cols-2 gap-4">
-              <MagnetCard src="/family.avif" label="Family" rotate="-rotate-3" />
-              <MagnetCard src="/love.avif" label="Couple" rotate="rotate-3 mt-8" />
-              <MagnetCard src="/birthday.avif" label="Birthday" rotate="rotate-2" />
-              <MagnetCard src="/travel.avif" label="Travel" rotate="-rotate-2 mt-6" />
-            </div>
+            <MagnetHero />
           </div>
         </div>
       </section>
 
       {/* Same-day delivery strip */}
-      <section className="bg-[#340d00]">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-1.5 px-4 py-7 text-center text-white sm:flex-row sm:gap-3 sm:px-6">
-          <span className="flex items-center gap-2 text-lg font-semibold">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gold">
-              <rect x="1" y="3" width="15" height="13" rx="1" />
-              <path d="M16 8h4l3 3v5h-7V8z" />
-              <circle cx="5.5" cy="18.5" r="2.5" />
-              <circle cx="18.5" cy="18.5" r="2.5" />
-            </svg>
-            Same-day delivery in Noida, Delhi &amp; Ghaziabad
-          </span>
-          <span className="text-sm text-white/70 sm:text-base">— everywhere else in India within 24–48 hours</span>
-        </div>
-      </section>
+   
       {/* Full-width banner carousel — shown before the hero */}
 
 
@@ -193,6 +176,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* 3D magnet showcase */}
+      <MagnetShowcase />
 
       {/* Occasions / use-cases */}
       <section className="mx-auto max-w-7xl px-4 pb-4 sm:px-6">
@@ -486,9 +472,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Reviews */}
+      {/* Reviews — full-height wall of love */}
       <div id="reviews" className="scroll-mt-20">
-        <Reviews />
+        <TestimonialWall />
       </div>
 
       {/* Final CTA */}
@@ -510,32 +496,6 @@ export default function HomePage() {
         </div>
       </section>
     </>
-  );
-}
-
-function MagnetCard({
-  src,
-  label,
-  rotate,
-}: {
-  src: string;
-  label: string;
-  rotate: string;
-}) {
-  return (
-    <div className={`animate-floaty rounded-2xl border border-line bg-white p-2 shadow-xl ${rotate}`}>
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-cream">
-        <Image
-          src={src}
-          alt={`${label} custom magnet`}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 45vw, 260px"
-          priority
-        />
-      </div>
-      <p className="mt-2 text-center text-sm font-semibold text-charcoal">{label}</p>
-    </div>
   );
 }
 

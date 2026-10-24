@@ -62,6 +62,62 @@ export const REVIEWS: Review[] = [
     rating: 5,
     text: "Used the same baby photo for all 6 magnets and gifted them to family. The finish is glossy and looks really premium.",
     image: ""
+  },
+  {
+    name: "Arjun Mehta",
+    location: "Indirapuram, Ghaziabad",
+    rating: 5,
+    text: "Ordered at night, got them the very next day. The colours are rich and the magnets hold firmly on the fridge.",
+    image: ""
+  },
+  {
+    name: "Ritika Jain",
+    location: "Vaishali, Ghaziabad",
+    rating: 5,
+    text: "Gifted a 12-pack to my mom on her birthday. She keeps showing them to everyone who visits. Worth every rupee.",
+    image: ""
+  },
+  {
+    name: "Mohammed Faizan",
+    location: "Lajpat Nagar, Delhi",
+    rating: 5,
+    text: "Was worried about print quality from a photo clicked on my old phone, but it came out surprisingly sharp.",
+    image: ""
+  },
+  {
+    name: "Ananya Reddy",
+    location: "Sector 50, Noida",
+    rating: 5,
+    text: "The packaging was so neat, felt like opening a gift. Magnets are thick and sturdy, not flimsy at all.",
+    image: ""
+  },
+  {
+    name: "Vikram Nair",
+    location: "Kaushambi, Ghaziabad",
+    rating: 4,
+    text: "Good product and quick delivery. Would love a few more shape options, but the quality is solid.",
+    image: ""
+  },
+  {
+    name: "Pooja Sharma",
+    location: "Rohini, Delhi",
+    rating: 5,
+    text: "Made a whole set from our wedding album. Our fridge is now a little gallery of memories. Loved it!",
+    image: ""
+  },
+  {
+    name: "Harshit Agarwal",
+    location: "Crossings Republik, Ghaziabad",
+    rating: 5,
+    text: "Second time ordering. Consistent quality both times and the same-day delivery in NCR is a game changer.",
+    image: ""
+  },
+  {
+    name: "Nisha Verma",
+    location: "Mayur Vihar, Delhi",
+    rating: 5,
+    text: "Customer support helped me crop my photos perfectly over WhatsApp. Such a personal touch, rare these days.",
+    image: ""
   }
 ];
 
