@@ -11,6 +11,7 @@ import { openRazorpayCheckout } from "@/lib/razorpay";
 import {
   PRICING_TIERS, getTier, computePricing, quantityLabel,
   CURRENCY_SYMBOL, EXTRA_MAGNET_PRICE, MAX_QUANTITY, COD_FEE,
+  MIN_QUANTITY, BASE_PACK_QTY,
 } from "@/lib/pricing";
 
 type PaymentMethod = "online" | "cod";
@@ -39,7 +40,9 @@ export default function ProductConfigurator() {
 
   const initialQty = Number(searchParams.get("qty"));
   const [quantity, setQuantity] = useState<number>(
-    getTier(initialQty) || initialQty > 10 ? initialQty : 3
+    getTier(initialQty) || (initialQty > BASE_PACK_QTY && initialQty <= MAX_QUANTITY)
+      ? initialQty
+      : MIN_QUANTITY
   );
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -115,7 +118,8 @@ export default function ProductConfigurator() {
   const isCustom = !getTier(quantity);
 
   function setCustomQuantity(value: number) {
-    const v = Math.max(11, Math.min(MAX_QUANTITY, Math.floor(value || 11)));
+    const min = BASE_PACK_QTY + 1; // 19
+    const v = Math.max(min, Math.min(MAX_QUANTITY, Math.floor(value || min)));
     setQuantity(v);
   }
 
@@ -471,7 +475,7 @@ function Step1({ quantity, setQuantity, isCustom, setCustomQuantity, pricing }: 
   return (
     <section>
       <h2 className="text-sm font-semibold uppercase tracking-wide text-terracotta">1. Choose your pack</h2>
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
+      <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
         {PRICING_TIERS.map((t) => (
           <button key={t.quantity} type="button" onClick={() => setQuantity(t.quantity)}
             className={`relative rounded-xl border p-3 sm:p-4 text-center cursor-pointer transition-all ${
@@ -483,7 +487,7 @@ function Step1({ quantity, setQuantity, isCustom, setCustomQuantity, pricing }: 
               </span>
             )}
             <p className="text-xl sm:text-2xl font-extrabold text-charcoal">{t.quantity}</p>
-            <p className="text-xs text-muted">{t.quantity === 1 ? "magnet" : "magnets"}</p>
+            <p className="text-xs text-muted">magnets</p>
             <p className="mt-1 sm:mt-1.5 font-semibold text-terracotta">{CURRENCY_SYMBOL}{t.price}</p>
             <p className="text-[10px] text-muted">{CURRENCY_SYMBOL}{t.perPiece}/each</p>
           </button>
@@ -491,16 +495,16 @@ function Step1({ quantity, setQuantity, isCustom, setCustomQuantity, pricing }: 
       </div>
       <div className={`mt-3 flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 rounded-xl border p-4 ${isCustom ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-white"}`}>
         <div>
-          <p className="text-sm font-semibold text-charcoal">Need more than 10?</p>
-          <p className="text-xs text-muted">Each extra magnet just {CURRENCY_SYMBOL}{EXTRA_MAGNET_PRICE}</p>
+          <p className="text-sm font-semibold text-charcoal">Need more than 18?</p>
+          <p className="text-xs text-muted">Add up to {MAX_QUANTITY} — each extra magnet just {CURRENCY_SYMBOL}{EXTRA_MAGNET_PRICE}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={() => setCustomQuantity((isCustom ? quantity : 12) - 1)}
+          <button type="button" onClick={() => setCustomQuantity((isCustom ? quantity : 19) - 1)}
             className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-white text-lg hover:bg-cream shrink-0">−</button>
-          <input type="number" min={11} max={MAX_QUANTITY} value={isCustom ? quantity : ""}
-            placeholder="11+" onChange={(e) => setCustomQuantity(Number(e.target.value))}
+          <input type="number" min={19} max={MAX_QUANTITY} value={isCustom ? quantity : ""}
+            placeholder="19+" onChange={(e) => setCustomQuantity(Number(e.target.value))}
             className="input w-16 sm:w-20 text-center" />
-          <button type="button" onClick={() => setCustomQuantity((isCustom ? quantity : 10) + 1)}
+          <button type="button" onClick={() => setCustomQuantity((isCustom ? quantity : 18) + 1)}
             className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-white text-lg hover:bg-cream shrink-0">+</button>
         </div>
       </div>

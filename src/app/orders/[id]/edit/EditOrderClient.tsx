@@ -13,7 +13,6 @@ import {
   CURRENCY_SYMBOL,
   EXTRA_MAGNET_PRICE,
   MAX_QUANTITY,
-  GST_RATE,
 } from "@/lib/pricing";
 
 type Address = {
@@ -41,7 +40,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [quantity, setQuantity] = useState<number>(3);
+  const [quantity, setQuantity] = useState<number>(6);
   const [images, setImages] = useState<string[]>([]);
   const [note, setNote] = useState("");
   const [address, setAddress] = useState<Address>(EMPTY_ADDRESS);
@@ -101,7 +100,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
   const isCustom = !getTier(quantity);
 
   function setCustomQuantity(value: number) {
-    const v = Math.max(11, Math.min(MAX_QUANTITY, Math.floor(value || 11)));
+    const v = Math.max(19, Math.min(MAX_QUANTITY, Math.floor(value || 19)));
     setQuantity(v);
   }
 
@@ -243,7 +242,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
             <h2 className="text-sm font-semibold uppercase tracking-wide text-terracotta">
               1. Pack size
             </h2>
-            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="mt-3 grid grid-cols-3 gap-3">
               {PRICING_TIERS.map((t) => (
                 <button
                   key={t.quantity}
@@ -276,16 +275,16 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
               }`}
             >
               <div>
-                <p className="text-sm font-semibold text-charcoal">Need more than 10?</p>
+                <p className="text-sm font-semibold text-charcoal">Need more than 18?</p>
                 <p className="text-xs text-muted">
-                  Each extra magnet is just {CURRENCY_SYMBOL}
+                  Add up to {MAX_QUANTITY} — each extra magnet is just {CURRENCY_SYMBOL}
                   {EXTRA_MAGNET_PRICE}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setCustomQuantity((isCustom ? quantity : 12) - 1)}
+                  onClick={() => setCustomQuantity((isCustom ? quantity : 19) - 1)}
                   aria-label="Decrease quantity"
                   className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-white text-lg text-charcoal hover:bg-cream"
                 >
@@ -293,16 +292,16 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                 </button>
                 <input
                   type="number"
-                  min={11}
+                  min={19}
                   max={MAX_QUANTITY}
                   value={isCustom ? quantity : ""}
-                  placeholder="11+"
+                  placeholder="19+"
                   onChange={(e) => setCustomQuantity(Number(e.target.value))}
                   className="input w-20 text-center"
                 />
                 <button
                   type="button"
-                  onClick={() => setCustomQuantity((isCustom ? quantity : 10) + 1)}
+                  onClick={() => setCustomQuantity((isCustom ? quantity : 18) + 1)}
                   aria-label="Increase quantity"
                   className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-white text-lg text-charcoal hover:bg-cream"
                 >
@@ -457,14 +456,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                 {pricing.subtotal}
               </span>
             </div>
-            <div className="mt-2 flex items-center justify-between text-sm">
-              <span className="text-muted">GST ({Math.round(GST_RATE * 100)}%)</span>
-              <span className="font-medium text-charcoal">
-                {CURRENCY_SYMBOL}
-                {pricing.gst}
-              </span>
-            </div>
-            <div className="mt-2 flex items-center justify-between border-t border-line pt-3">
+            <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
               <span className="font-semibold text-charcoal">Total</span>
               <span className="text-2xl font-extrabold text-terracotta">
                 {CURRENCY_SYMBOL}

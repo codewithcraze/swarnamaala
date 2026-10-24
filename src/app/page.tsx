@@ -7,12 +7,14 @@ import Reviews from "@/components/Reviews";
 import {HighQualityPrint, StrongMagnetIcon, Packageing, Fire, BestPrice, First, Second} from '@/components/svg';
 
 export default function HomePage() {
+  // Per-magnet rate of the smallest pack — used as the baseline for "you save" copy.
+  const BASE_PER_PIECE = PRICING_TIERS[0].perPiece;
   const productJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: "Custom Photo Magnet",
     description:
-      "Personalised custom photo magnets printed on premium material. Upload your photos and choose a pack of 1, 3, 6 or 10 (or more).",
+      "Personalised custom photo magnets printed on premium material. Upload your photos and choose a pack of 6, 12 or 18 (or any amount up to 50).",
     brand: { "@type": "Brand", name: "swarnamaala.in" },
     aggregateRating: {
       "@type": "AggregateRating",
@@ -39,7 +41,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-10 sm:px-6 md:grid-cols-2 py-10">
-          <div style={{ height: "stretch" }} >
+          <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#340d00]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#340d00]" />
               Premium custom photo magnets
@@ -53,7 +55,7 @@ export default function HomePage() {
             </p>
             <p className="mt-4 max-w-lg leading-relaxed text-muted">
               Upload your favourite photos and we&apos;ll turn them into beautiful, durable
-              custom magnets. Packs starting at just {CURRENCY_SYMBOL}99, delivered across India.
+              custom magnets. Packs starting at just {CURRENCY_SYMBOL}299, delivered across India.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
@@ -69,7 +71,31 @@ export default function HomePage() {
                 How it works
               </Link>
             </div>
-            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-muted">
+            {/* Social proof row */}
+            <div className="mt-8 flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {["/feedback/alka.jpeg", "/feedback/suman.jpeg", "/feedback/customer3.jpeg", "/feedback/customer4.jpeg"].map((src) => (
+                  <span key={src} className="relative inline-block h-9 w-9 overflow-hidden rounded-full border-2 border-white shadow-sm">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="Happy customer" className="h-full w-full object-cover" loading="lazy" />
+                  </span>
+                ))}
+              </div>
+              <div>
+                <div className="flex items-center gap-1 text-gold">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <svg key={i} width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-xs text-muted">
+                  <span className="font-semibold text-charcoal">{AVERAGE_RATING}/5</span> from 2,000+ happy customers
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-muted">
               <span className="flex items-center gap-2">
                 <CheckIcon /> Free design preview
               </span>
@@ -96,11 +122,17 @@ export default function HomePage() {
 
       {/* Same-day delivery strip */}
       <section className="bg-[#340d00]">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-4 py-8 text-center text-lg font-medium text-white sm:flex-row sm:gap-6 sm:px-6">
-          <span className="flex items-center gap-2">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-1.5 px-4 py-7 text-center text-white sm:flex-row sm:gap-3 sm:px-6">
+          <span className="flex items-center gap-2 text-lg font-semibold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gold">
+              <rect x="1" y="3" width="15" height="13" rx="1" />
+              <path d="M16 8h4l3 3v5h-7V8z" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
             Same-day delivery in Noida, Delhi &amp; Ghaziabad
           </span>
-          <span>Or within 24-48 hours max, right to your doorstep</span>
+          <span className="text-sm text-white/70 sm:text-base">— everywhere else in India within 24–48 hours</span>
         </div>
       </section>
       {/* Full-width banner carousel — shown before the hero */}
@@ -162,6 +194,44 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Occasions / use-cases */}
+      <section className="mx-auto max-w-7xl px-4 pb-4 sm:px-6">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-block rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-charcoal">
+            A little magnet, a big feeling
+          </span>
+          <h2 className="mt-4 text-3xl font-bold text-charcoal sm:text-4xl">Made for the moments you keep</h2>
+          <p className="mt-3 text-muted">
+            The wedding you cried at. The trip you still talk about. The dog who runs the house.
+            Put them where you&apos;ll see them every single day.
+          </p>
+        </div>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { src: "/family.avif", title: "Family frames", desc: "Three generations on one fridge door." },
+            { src: "/love.avif", title: "Couples & weddings", desc: "Anniversaries that stay in sight." },
+            { src: "/birthday.avif", title: "Birthdays & gifts", desc: "A present that actually gets used." },
+            { src: "/travel.avif", title: "Travel memories", desc: "Every trip, back home with you." },
+          ].map((o) => (
+            <div key={o.title} className="group overflow-hidden rounded-3xl border border-line bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <div className="relative aspect-[4/5] overflow-hidden bg-cream">
+                <Image
+                  src={o.src}
+                  alt={o.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-charcoal/70 to-transparent p-4 pt-10">
+                  <p className="text-base font-bold text-white">{o.title}</p>
+                  <p className="text-xs text-white/85">{o.desc}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="scroll-mt-20 py-20 bg-cream">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -177,7 +247,7 @@ export default function HomePage() {
           </div>
 
           {/* Cards */}
-          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:mx-auto lg:max-w-5xl">
             {PRICING_TIERS.map((tier) => {
               const isFeatured = tier.badge === "Best Value";
               const isPopular = tier.badge === "Popular";
@@ -222,18 +292,18 @@ export default function HomePage() {
                         {CURRENCY_SYMBOL}{tier.perPiece} per magnet
                       </p>
                       <p className={`text-xs ${isFeatured ? "text-white/60" : "text-muted"}`}>
-                        + 18% GST
+                        All-inclusive · no hidden GST
                       </p>
                     </div>
 
-                    {/* Savings pill — only theme colors */}
-                    {tier.quantity > 1 && (
+                    {/* Savings pill — savings vs the smallest (6-pack) per-magnet rate */}
+                    {tier.perPiece < BASE_PER_PIECE && (
                       <div className={`mx-auto mb-5 rounded-full px-3 py-1 text-xs font-semibold ${
                         isFeatured
                           ? "bg-white/20 text-white"
                           : "bg-gold/15 text-charcoal"
                       }`}>
-                        Save {CURRENCY_SYMBOL}{(99 - tier.perPiece) * tier.quantity} vs single
+                        Save {CURRENCY_SYMBOL}{(BASE_PER_PIECE - tier.perPiece) * tier.quantity} vs the 6-pack rate
                       </div>
                     )}
 
@@ -258,19 +328,27 @@ export default function HomePage() {
             <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-sm">
               <span className="text-2xl">📦</span>
               <div>
-                <p className="text-sm font-semibold text-charcoal">Need more than 10 magnets?</p>
+                <p className="text-sm font-semibold text-charcoal">Need more than 18 magnets?</p>
                 <p className="text-sm text-muted">
-                  Each extra magnet is just <span className="font-bold text-terracotta">{CURRENCY_SYMBOL}{EXTRA_MAGNET_PRICE}</span>
-                  &nbsp;· All prices excl. 18% GST
+                  Order up to 50 — each extra magnet is just{" "}
+                  <span className="font-bold text-terracotta">{CURRENCY_SYMBOL}{EXTRA_MAGNET_PRICE}</span>
+                  &nbsp;· all-inclusive pricing
                 </p>
               </div>
               <Link
-                href="/products/custom-magnets?qty=15"
+                href="/products/custom-magnets?qty=24"
                 className="shrink-0 rounded-full border border-terracotta px-4 py-2 text-xs font-semibold text-terracotta transition-colors hover:bg-terracotta hover:text-white"
               >
                 Customise
               </Link>
             </div>
+          </div>
+
+          {/* Reassurance strip */}
+          <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted">
+            <span className="flex items-center gap-1.5"><CheckIcon /> No hidden charges</span>
+            <span className="flex items-center gap-1.5"><CheckIcon /> Free design preview</span>
+            <span className="flex items-center gap-1.5"><CheckIcon /> Damaged on arrival? We replace it</span>
           </div>
         </div>
       </section>

@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     const pricing = computePricing(quantity);
     if (!pricing) {
       return NextResponse.json(
-        { error: "Please choose a valid quantity (1, 3, 6, 10 or more)." },
+        { error: "Please choose a valid quantity (6, 12, 18 or any amount up to 50)." },
         { status: 400 }
       );
     }
