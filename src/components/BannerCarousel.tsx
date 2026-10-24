@@ -58,7 +58,7 @@ export default function BannerCarousel() {
       {/* Slides — fixed height so every banner shows fully without cropping.
           `object-contain` keeps the full image visible; the cream background fills
           any space around narrower images so there's no jarring letterbox. */}
-      <div className="relative w-full bg-[#FFF8F2]" style={{ height: "clamp(140px, 22vw, 420px)" }}>
+      <div className="relative w-full bg-cream" style={{ height: "clamp(140px, 22vw, 420px)" }}>
         {BANNERS.map((b, i) => (
           <div
             key={i}
@@ -78,7 +78,7 @@ export default function BannerCarousel() {
             <div className="absolute bottom-4 right-4 z-20 hidden sm:block">
               <Link
                 href={b.href}
-                className="rounded-full bg-terracotta px-5 py-2 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-terracotta-dark"
+                className="rounded-full bg-terracotta px-5 py-2 text-sm font-semibold text-onaccent shadow-lg transition-colors hover:bg-terracotta-dark"
               >
                 {b.cta}
               </Link>
@@ -91,7 +91,7 @@ export default function BannerCarousel() {
       <button
         onClick={prev}
         aria-label="Previous banner"
-        className="absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow backdrop-blur-sm transition hover:bg-white"
+        className="absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-surface/80 p-2 shadow backdrop-blur-sm transition hover:bg-surface"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path d="m15 18-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -100,7 +100,7 @@ export default function BannerCarousel() {
       <button
         onClick={next}
         aria-label="Next banner"
-        className="absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow backdrop-blur-sm transition hover:bg-white"
+        className="absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-surface/80 p-2 shadow backdrop-blur-sm transition hover:bg-surface"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path d="m9 18 6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -115,7 +115,7 @@ export default function BannerCarousel() {
             onClick={() => setCurrent(i)}
             aria-label={`Go to banner ${i + 1}`}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === current ? "w-5 bg-terracotta" : "w-1.5 bg-white/70"
+              i === current ? "w-5 bg-terracotta" : "w-1.5 bg-surface/70"
             }`}
           />
         ))}

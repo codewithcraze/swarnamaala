@@ -3,7 +3,7 @@ import Logo from "./Logo";
 
 export default function Footer() {
   return (
-    <footer className="mt-24 border-t border-line bg-[#340d00]">
+    <footer className="mt-24 border-t border-line bg-[#0b0806]">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-5">
         <div className="md:col-span-2">
           <Logo className="h-14 w-auto" />

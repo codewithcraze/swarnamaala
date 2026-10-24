@@ -45,9 +45,9 @@ function PinIcon() {
 
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <figure className="flex h-full flex-col rounded-2xl border border-line bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+    <figure className="flex h-full flex-col rounded-2xl border border-line bg-surface p-6 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-center gap-3">
-        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-terracotta to-terracotta-dark text-sm font-semibold text-white">
+        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-terracotta to-terracotta-dark text-sm font-semibold text-onaccent">
           {initials(review.name)}
         </div>
         <div className="min-w-0">
@@ -77,7 +77,7 @@ export default function Reviews() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-terracotta">
+        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-terracotta">
           Customer reviews
         </span>
         <h2 className="mt-5 text-3xl font-bold text-charcoal sm:text-4xl">

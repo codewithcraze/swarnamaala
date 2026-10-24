@@ -38,14 +38,14 @@ export default function AboutPage() {
           { title: "Strong magnet", desc: "Holds firmly, built to last." },
           { title: "Safe packaging", desc: "Delivered with care." },
         ].map((f) => (
-          <div key={f.title} className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+          <div key={f.title} className="rounded-2xl border border-line bg-surface p-6 shadow-sm">
             <h2 className="font-semibold text-charcoal">{f.title}</h2>
             <p className="mt-1 text-sm text-muted">{f.desc}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-10 rounded-2xl border border-line bg-white p-6 shadow-sm">
+      <div className="mt-10 rounded-2xl border border-line bg-surface p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-charcoal">Get in touch</h2>
         <p className="mt-2 text-sm text-muted">
           Questions or bulk orders? Reach us on WhatsApp at{" "}

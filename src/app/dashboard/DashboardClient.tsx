@@ -27,8 +27,8 @@ const STATUS_STYLES: Record<string, string> = {
   pending: "bg-gold/20 text-terracotta-dark",
   processing: "bg-sky-100 text-sky-700",
   shipped: "bg-indigo-100 text-indigo-700",
-  delivered: "bg-emerald-100 text-emerald-700",
-  cancelled: "bg-red-100 text-red-600",
+  delivered: "bg-emerald-100 text-emerald-400",
+  cancelled: "bg-red-100 text-red-400",
 };
 
 export default function DashboardClient() {
@@ -70,7 +70,7 @@ export default function DashboardClient() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
         <p className="text-lg font-semibold text-charcoal">Couldn&apos;t load your rewards</p>
-        <Link href="/" className="mt-6 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-white">
+        <Link href="/" className="mt-6 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-onaccent">
           Go home
         </Link>
       </div>
@@ -91,7 +91,7 @@ export default function DashboardClient() {
 
       {/* Stats */}
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-line bg-surface p-6 shadow-sm">
           <p className="text-sm text-muted">Total earned</p>
           <p className="mt-1 text-3xl font-extrabold text-terracotta">
             {CURRENCY_SYMBOL}
@@ -99,7 +99,7 @@ export default function DashboardClient() {
           </p>
           <p className="mt-1 text-xs text-muted">Credited to your wallet</p>
         </div>
-        <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-line bg-surface p-6 shadow-sm">
           <p className="text-sm text-muted">Pending</p>
           <p className="mt-1 text-3xl font-extrabold text-gold">
             {CURRENCY_SYMBOL}
@@ -107,7 +107,7 @@ export default function DashboardClient() {
           </p>
           <p className="mt-1 text-xs text-muted">Credited after delivery</p>
         </div>
-        <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-line bg-surface p-6 shadow-sm">
           <p className="text-sm text-muted">Friends joined</p>
           <p className="mt-1 text-3xl font-extrabold text-charcoal">{data.referredCount}</p>
           <p className="mt-1 text-xs text-muted">Signed up with your code</p>
@@ -115,13 +115,13 @@ export default function DashboardClient() {
       </div>
 
       {/* Referral link */}
-      <div className="mt-6 rounded-2xl border border-line bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-2xl border border-line bg-surface p-6 shadow-sm">
         <h2 className="font-semibold text-charcoal">Your referral link</h2>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row">
           <input readOnly value={data.referralUrl} className="input flex-1" />
           <button
             onClick={copyLink}
-            className="cursor-pointer rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-terracotta-dark"
+            className="cursor-pointer rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-onaccent transition-colors hover:bg-terracotta-dark"
           >
             {copied ? "Copied!" : "Copy link"}
           </button>
@@ -165,7 +165,7 @@ export default function DashboardClient() {
       <div className="mt-8">
         <h2 className="text-lg font-semibold text-charcoal">Referral activity</h2>
         {data.recent.length === 0 ? (
-          <div className="mt-4 rounded-2xl border border-line bg-white p-8 text-center text-sm text-muted shadow-sm">
+          <div className="mt-4 rounded-2xl border border-line bg-surface p-8 text-center text-sm text-muted shadow-sm">
             No referrals yet. Share your link to start earning!
           </div>
         ) : (
@@ -173,7 +173,7 @@ export default function DashboardClient() {
             {data.recent.map((r) => (
               <div
                 key={r.id}
-                className="flex items-center justify-between rounded-2xl border border-line bg-white p-4 shadow-sm"
+                className="flex items-center justify-between rounded-2xl border border-line bg-surface p-4 shadow-sm"
               >
                 <div>
                   <p className="font-medium text-charcoal">{r.friend}</p>
@@ -197,7 +197,7 @@ export default function DashboardClient() {
                     {r.status}
                   </span>
                   <span
-                    className={`text-sm font-bold ${r.credited ? "text-emerald-600" : "text-gold"}`}
+                    className={`text-sm font-bold ${r.credited ? "text-emerald-300" : "text-gold"}`}
                   >
                     {r.credited ? "+" : ""}
                     {CURRENCY_SYMBOL}

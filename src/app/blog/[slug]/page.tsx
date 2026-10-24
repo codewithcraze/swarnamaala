@@ -125,7 +125,7 @@ export default async function BlogPostPage({ params }: Props) {
         <p className="mt-1 text-sm text-muted">Premium custom photo magnets, delivered across India.</p>
         <Link
           href="/products/custom-magnets"
-          className="mt-4 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-terracotta-dark"
+          className="mt-4 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-onaccent transition-colors hover:bg-terracotta-dark"
         >
           Create your magnets
         </Link>

@@ -30,7 +30,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-t border-[#340d00] border-line bg-cream/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-line bg-cream/85 backdrop-blur-md">
         <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Logo onClick={() => setOpen(false)} priority />
 
@@ -65,7 +65,7 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={() => logout()}
-                  className="cursor-pointer rounded-full border border-line px-4 py-2 text-sm font-medium text-charcoal transition-colors hover:bg-white"
+                  className="cursor-pointer rounded-full border border-line px-4 py-2 text-sm font-medium text-charcoal transition-colors hover:bg-surface"
                 >
                   Sign out
                 </button>
@@ -80,7 +80,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/products/custom-magnets"
-                  className="rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-terracotta-dark"
+                  className="rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-onaccent shadow-sm transition-colors hover:bg-terracotta-dark"
                 >
                   Order Now
                 </Link>
@@ -128,7 +128,7 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className={`rounded-xl px-4 py-4 text-xl font-semibold transition-colors hover:bg-white ${
+                  className={`rounded-xl px-4 py-4 text-xl font-semibold transition-colors hover:bg-surface ${
                     pathname === link.href ? "text-terracotta" : "text-charcoal"
                   }`}
                 >
@@ -143,14 +143,14 @@ export default function Navbar() {
                   <Link
                     href="/dashboard"
                     onClick={() => setOpen(false)}
-                    className="rounded-full border border-line px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-white"
+                    className="rounded-full border border-line px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-surface"
                   >
                     Referral Rewards
                   </Link>
                   <Link
                     href="/orders"
                     onClick={() => setOpen(false)}
-                    className="rounded-full border border-line px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-white"
+                    className="rounded-full border border-line px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-surface"
                   >
                     My Orders
                   </Link>
@@ -159,7 +159,7 @@ export default function Navbar() {
                       logout();
                       setOpen(false);
                     }}
-                    className="cursor-pointer rounded-full border border-line px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-white"
+                    className="cursor-pointer rounded-full border border-line px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-surface"
                   >
                     Sign out
                   </button>
@@ -169,14 +169,14 @@ export default function Navbar() {
                   <Link
                     href="/signin"
                     onClick={() => setOpen(false)}
-                    className="rounded-full border border-line px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-white"
+                    className="rounded-full border border-line px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-surface"
                   >
                     Sign in
                   </Link>
                   <Link
                     href="/products/custom-magnets"
                     onClick={() => setOpen(false)}
-                    className="rounded-full bg-terracotta px-6 py-3.5 text-center text-base font-semibold text-white shadow-sm"
+                    className="rounded-full bg-terracotta px-6 py-3.5 text-center text-base font-semibold text-onaccent shadow-sm"
                   >
                     Order Now
                   </Link>

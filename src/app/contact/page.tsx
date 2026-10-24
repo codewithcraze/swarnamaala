@@ -16,7 +16,7 @@ export default function ContactPage() {
       </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-line bg-surface p-6 shadow-sm">
           <h2 className="font-semibold text-charcoal">WhatsApp &amp; Phone</h2>
           <a
             href="https://wa.me/919084248821"
@@ -27,7 +27,7 @@ export default function ContactPage() {
           <p className="mt-1 text-sm text-muted">Fastest way to reach us. 10am–8pm, all days.</p>
         </div>
 
-        <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-line bg-surface p-6 shadow-sm">
           <h2 className="font-semibold text-charcoal">Email</h2>
           <a
             href="mailto:hello@swarnamaala.in"
@@ -38,7 +38,7 @@ export default function ContactPage() {
           <p className="mt-1 text-sm text-muted">We reply within 24 hours.</p>
         </div>
 
-        <div className="rounded-2xl border border-line bg-white p-6 shadow-sm sm:col-span-2">
+        <div className="rounded-2xl border border-line bg-surface p-6 shadow-sm sm:col-span-2">
           <h2 className="font-semibold text-charcoal">Business Address</h2>
           <p className="mt-2 text-sm text-muted">
             swarnamaala.in
@@ -51,7 +51,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <div className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-sm">
+      <div className="mt-8 rounded-2xl border border-line bg-surface p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-charcoal">Send us a message</h2>
         <form
           className="mt-4 space-y-4"
@@ -74,7 +74,7 @@ export default function ContactPage() {
           </label>
           <a
             href="https://wa.me/919084248821"
-            className="inline-block rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-terracotta-dark"
+            className="inline-block rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-onaccent transition-colors hover:bg-terracotta-dark"
           >
             Chat on WhatsApp
           </a>

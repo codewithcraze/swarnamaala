@@ -198,7 +198,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
         </p>
         <Link
           href="/orders"
-          className="mt-6 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-white"
+          className="mt-6 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-onaccent"
         >
           Back to orders
         </Link>
@@ -228,7 +228,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
           </p>
           <Link
             href="/orders"
-            className="mt-3 inline-block rounded-full border border-line bg-white px-5 py-2 text-sm font-semibold text-charcoal"
+            className="mt-3 inline-block rounded-full border border-line bg-surface px-5 py-2 text-sm font-semibold text-charcoal"
           >
             Back to orders
           </Link>
@@ -251,11 +251,11 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                   className={`relative rounded-xl border p-4 text-center transition-all ${
                     quantity === t.quantity
                       ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30"
-                      : "border-line bg-white hover:border-terracotta/50"
+                      : "border-line bg-surface hover:border-terracotta/50"
                   }`}
                 >
                   {t.badge && (
-                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-terracotta px-2 py-0.5 text-[10px] font-semibold text-white">
+                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-terracotta px-2 py-0.5 text-[10px] font-semibold text-onaccent">
                       {t.badge}
                     </span>
                   )}
@@ -271,7 +271,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
 
             <div
               className={`mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4 ${
-                isCustom ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-white"
+                isCustom ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-surface"
               }`}
             >
               <div>
@@ -286,7 +286,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                   type="button"
                   onClick={() => setCustomQuantity((isCustom ? quantity : 19) - 1)}
                   aria-label="Decrease quantity"
-                  className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-white text-lg text-charcoal hover:bg-cream"
+                  className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-surface text-lg text-charcoal hover:bg-cream"
                 >
                   −
                 </button>
@@ -303,7 +303,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                   type="button"
                   onClick={() => setCustomQuantity((isCustom ? quantity : 18) + 1)}
                   aria-label="Increase quantity"
-                  className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-white text-lg text-charcoal hover:bg-cream"
+                  className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-surface text-lg text-charcoal hover:bg-cream"
                 >
                   +
                 </button>
@@ -373,7 +373,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                     type="button"
                     onClick={openPicker}
                     disabled={uploading}
-                    className="grid aspect-square cursor-pointer place-items-center rounded-xl border-2 border-dashed border-line bg-white text-muted transition-colors hover:border-terracotta/60 hover:text-terracotta disabled:opacity-60"
+                    className="grid aspect-square cursor-pointer place-items-center rounded-xl border-2 border-dashed border-line bg-surface text-muted transition-colors hover:border-terracotta/60 hover:text-terracotta disabled:opacity-60"
                   >
                     <span className="text-center text-xs">
                       <span className="block text-2xl">+</span>
@@ -389,7 +389,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                 type="button"
                 onClick={openPicker}
                 disabled={uploading || remaining <= 0}
-                className="cursor-pointer rounded-full border border-line bg-white px-4 py-2 text-xs font-semibold text-charcoal transition-colors hover:bg-cream disabled:opacity-50"
+                className="cursor-pointer rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold text-charcoal transition-colors hover:bg-cream disabled:opacity-50"
               >
                 {uploading ? "Uploading..." : "Upload photos"}
               </button>
@@ -397,7 +397,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                 <button
                   type="button"
                   onClick={() => useForAll(images[0])}
-                  className="cursor-pointer rounded-full border border-line bg-white px-4 py-2 text-xs font-semibold text-charcoal transition-colors hover:bg-cream"
+                  className="cursor-pointer rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold text-charcoal transition-colors hover:bg-cream"
                 >
                   Use photo #1 for all {quantity}
                 </button>
@@ -448,7 +448,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
           </section>
 
           {/* Summary + actions */}
-          <div className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-line bg-surface p-5 shadow-sm">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted">{quantityLabel(quantity)}</span>
               <span className="font-medium text-charcoal">
@@ -465,20 +465,20 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
             </div>
 
             {error && (
-              <p className="mt-4 rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>
+              <p className="mt-4 rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
             )}
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
               <button
                 type="submit"
                 disabled={submitting || uploading}
-                className="flex-1 cursor-pointer rounded-full bg-terracotta px-6 py-3.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-terracotta-dark disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 cursor-pointer rounded-full bg-terracotta px-6 py-3.5 text-base font-semibold text-onaccent shadow-sm transition-colors hover:bg-terracotta-dark disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting ? "Saving..." : "Save changes"}
               </button>
               <Link
                 href="/orders"
-                className="rounded-full border border-line bg-white px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-cream"
+                className="rounded-full border border-line bg-surface px-6 py-3.5 text-center text-base font-semibold text-charcoal transition-colors hover:bg-cream"
               >
                 Cancel
               </Link>

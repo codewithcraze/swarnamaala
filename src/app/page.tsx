@@ -5,6 +5,8 @@ import { REVIEWS, AVERAGE_RATING } from "@/lib/reviews";
 import TestimonialWall from "@/components/TestimonialWall";
 import MagnetShowcase from "@/components/MagnetShowcase";
 import MagnetHero from "@/components/MagnetHero";
+import StepsTimeline from "@/components/StepsTimeline";
+import PricingSection from "@/components/PricingSection";
 
 import {HighQualityPrint, StrongMagnetIcon, Packageing, Fire, BestPrice, First, Second} from '@/components/svg';
 
@@ -44,8 +46,8 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 md:gap-12 md:grid-cols-2 md:py-10">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#340d00]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#340d00]" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-terracotta/40 bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-terracotta">
+              <span className="h-1.5 w-1.5 rounded-full bg-terracotta" />
               Premium custom photo magnets
             </span>
             <h1 className="mt-5 text-4xl font-extrabold leading-tight text-charcoal sm:text-5xl lg:text-6xl">
@@ -62,13 +64,13 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/products/custom-magnets"
-                className="rounded-full bg-[#340d00] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-terracotta/25 transition-colors hover:bg-terracotta-dark"
+                className="rounded-full bg-terracotta px-8 py-3.5 text-base font-semibold text-onaccent shadow-lg shadow-terracotta/20 transition-colors hover:bg-terracotta-dark"
               >
                 Create your magnets
               </Link>
               <Link
                 href="/#how-it-works"
-                className="rounded-full border border-line bg-white px-8 py-3.5 text-base font-semibold text-charcoal transition-colors hover:bg-cream"
+                className="rounded-full border border-line bg-surface px-8 py-3.5 text-base font-semibold text-charcoal transition-colors hover:bg-cream"
               >
                 How it works
               </Link>
@@ -77,7 +79,7 @@ export default function HomePage() {
             <div className="mt-8 flex items-center gap-3">
               <div className="flex -space-x-2">
                 {["/feedback/alka.jpeg", "/feedback/suman.jpeg", "/feedback/customer3.jpeg", "/feedback/customer4.jpeg"].map((src) => (
-                  <span key={src} className="relative inline-block h-9 w-9 overflow-hidden rounded-full border-2 border-white shadow-sm">
+                  <span key={src} className="relative inline-block h-9 w-9 overflow-hidden rounded-full border-2 border-cream shadow-sm">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="Happy customer" className="h-full w-full object-cover" loading="lazy" />
                   </span>
@@ -141,41 +143,8 @@ export default function HomePage() {
       </section>
    
 
-      {/* How it works */}
-      <section id="how-it-works" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-20 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold text-charcoal sm:text-4xl">Three simple steps</h2>
-          <p className="mt-3 text-muted">From your camera roll to your doorstep in no time.</p>
-        </div>
-        <div className="mt-14 grid gap-8 md:grid-cols-3">
-          {[
-            {
-              step: "01",
-              title: "Upload your photos",
-              desc: "Sign in, choose a pack, and upload one photo for each magnet — or reuse the same photo for all of them.",
-            },
-            {
-              step: "02",
-              title: "We print it beautifully",
-              desc: "Your photos are printed on premium magnet material with a crisp, vibrant finish.",
-            },
-            {
-              step: "03",
-              title: "Delivered to your door",
-              desc: "We carefully pack and ship your magnets anywhere in India within days.",
-            },
-          ].map((s) => (
-            <div
-              key={s.step}
-              className="rounded-2xl border border-line bg-white p-8 shadow-sm transition-shadow hover:shadow-md"
-            >
-              <span className="text-4xl font-extrabold text-gold">{s.step}</span>
-              <h3 className="mt-4 text-lg font-semibold text-charcoal">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* How it works — animated timeline */}
+      <StepsTimeline />
 
       {/* 3D magnet showcase */}
       <MagnetShowcase />
@@ -199,7 +168,7 @@ export default function HomePage() {
             { src: "/birthday.avif", title: "Birthdays & gifts", desc: "A present that actually gets used." },
             { src: "/travel.avif", title: "Travel memories", desc: "Every trip, back home with you." },
           ].map((o) => (
-            <div key={o.title} className="group overflow-hidden rounded-3xl border border-line bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div key={o.title} className="group overflow-hidden rounded-3xl border border-line bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
               <div className="relative aspect-[4/5] overflow-hidden bg-cream">
                 <Image
                   src={o.src}
@@ -219,125 +188,7 @@ export default function HomePage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="scroll-mt-20 py-20 bg-cream">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Header */}
-          <div className="mx-auto max-w-2xl text-center">
-            <span className="inline-block rounded-full border border-terracotta/30 bg-terracotta/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-terracotta">
-              Transparent Pricing
-            </span>
-            <h2 className="mt-4 text-3xl font-extrabold text-charcoal sm:text-4xl">
-              Simple, honest pricing
-            </h2>
-            <p className="mt-3 text-muted">The more you order, the more you save per magnet.</p>
-          </div>
-
-          {/* Cards */}
-          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:mx-auto lg:max-w-5xl">
-            {PRICING_TIERS.map((tier) => {
-              const isFeatured = tier.badge === "Best Value";
-              const isPopular = tier.badge === "Popular";
-              return (
-                <div
-                  key={tier.quantity}
-                  className={`group relative flex flex-col overflow-hidden rounded-3xl border transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${
-                    isFeatured
-                      ? "border-terracotta bg-gradient-to-b from-terracotta to-terracotta-dark text-white shadow-lg shadow-terracotta/30"
-                      : isPopular
-                        ? "border-gold bg-white shadow-md"
-                        : "border-line bg-white shadow-sm"
-                  }`}
-                >
-                  {/* Badge */}
-                  {tier.badge && (
-                    <div className={`flex items-center justify-center gap-1.5 py-2 text-xs font-bold uppercase tracking-widest ${
-                      isFeatured ? "bg-terracotta-dark/40 text-white" : "bg-gold text-white"
-                    }`}>
-                      {isFeatured ? <BestPrice /> : <Fire />}{tier.badge}
-                    </div>
-                  )}
-
-                  <div className="flex flex-1 flex-col p-6 text-center">
-                    {/* Magnet count */}
-                    <div className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl font-extrabold ${
-                      isFeatured ? "bg-white/20 text-white" : "bg-terracotta/10 text-terracotta"
-                    }`}>
-                      {tier.quantity}
-                    </div>
-
-                    <p className={`text-base font-semibold ${isFeatured ? "text-white" : "text-charcoal"}`}>
-                      {tier.label}
-                    </p>
-
-                    {/* Price */}
-                    <div className="my-5">
-                      <div className={`text-5xl font-extrabold leading-none ${isFeatured ? "text-white" : "text-terracotta"}`}>
-                        {CURRENCY_SYMBOL}{tier.price}
-                      </div>
-                      <p className={`mt-2 text-sm ${isFeatured ? "text-white/80" : "text-muted"}`}>
-                        {CURRENCY_SYMBOL}{tier.perPiece} per magnet
-                      </p>
-                      <p className={`text-xs ${isFeatured ? "text-white/60" : "text-muted"}`}>
-                        All-inclusive · no hidden GST
-                      </p>
-                    </div>
-
-                    {/* Savings pill — savings vs the smallest (6-pack) per-magnet rate */}
-                    {tier.perPiece < BASE_PER_PIECE && (
-                      <div className={`mx-auto mb-5 rounded-full px-3 py-1 text-xs font-semibold ${
-                        isFeatured
-                          ? "bg-white/20 text-white"
-                          : "bg-gold/15 text-charcoal"
-                      }`}>
-                        Save {CURRENCY_SYMBOL}{(BASE_PER_PIECE - tier.perPiece) * tier.quantity} vs the 6-pack rate
-                      </div>
-                    )}
-
-                    <Link
-                      href={`/products/custom-magnets?qty=${tier.quantity}`}
-                      className={`mt-auto block rounded-full py-3 text-sm font-bold transition-all hover:scale-[1.03] ${
-                        isFeatured
-                          ? "bg-white text-terracotta hover:bg-cream"
-                          : "bg-terracotta text-white hover:bg-terracotta-dark"
-                      }`}
-                    >
-                      Order Now →
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Custom quantity note */}
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-sm">
-              <span className="text-2xl">📦</span>
-              <div>
-                <p className="text-sm font-semibold text-charcoal">Need more than 18 magnets?</p>
-                <p className="text-sm text-muted">
-                  Order up to 50 — each extra magnet is just{" "}
-                  <span className="font-bold text-terracotta">{CURRENCY_SYMBOL}{EXTRA_MAGNET_PRICE}</span>
-                  &nbsp;· all-inclusive pricing
-                </p>
-              </div>
-              <Link
-                href="/products/custom-magnets?qty=24"
-                className="shrink-0 rounded-full border border-terracotta px-4 py-2 text-xs font-semibold text-terracotta transition-colors hover:bg-terracotta hover:text-white"
-              >
-                Customise
-              </Link>
-            </div>
-          </div>
-
-          {/* Reassurance strip */}
-          <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted">
-            <span className="flex items-center gap-1.5"><CheckIcon /> No hidden charges</span>
-            <span className="flex items-center gap-1.5"><CheckIcon /> Free design preview</span>
-            <span className="flex items-center gap-1.5"><CheckIcon /> Damaged on arrival? We replace it</span>
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* Refer & Earn */}
       <section className="relative overflow-hidden py-8">
@@ -364,7 +215,7 @@ export default function HomePage() {
           <div className="mt-14 grid gap-5 sm:grid-cols-3">
             {[
               {
-                order: 399, reward: 29,
+                order: 299, reward: 29,
                 icon: "🥉", label: "Starter",
                 bg: "from-cream to-line/40",
                 border: "border-line",
@@ -389,10 +240,6 @@ export default function HomePage() {
                 key={t.order}
                 className={`group relative overflow-hidden rounded-3xl border-2 bg-gradient-to-br p-7 text-center shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${t.bg} ${t.border}`}
               >
-                {/* Decorative circles using theme white */}
-                <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/50" />
-                <div className="pointer-events-none absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-white/40" />
-
                 <div className="relative">
                   <div className="flex justify-center text-5xl">{t.icon}</div>
                   <p className={`mt-3 inline-block rounded-full px-3 py-1 text-xs font-bold ${t.badge}`}>
@@ -412,27 +259,25 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* CTA block — uses charcoal→terracotta gradient (all theme) */}
-          <div className="relative mt-14 overflow-hidden rounded-3xl bg-gradient-to-r from-charcoal to-terracotta px-8 py-10 text-center shadow-xl sm:px-16">
-            <div className="pointer-events-none absolute -left-10 -top-10 h-48 w-48 rounded-full bg-white/5 blur-2xl" />
-            <div className="pointer-events-none absolute -bottom-10 -right-10 h-48 w-48 rounded-full bg-gold/10 blur-2xl" />
-            <p className="relative text-sm font-semibold uppercase tracking-widest text-white/60">Ready to earn?</p>
-            <h3 className="relative mt-2 text-2xl font-extrabold text-white sm:text-3xl">
+          {/* CTA block */}
+          <div className="relative mt-14 overflow-hidden rounded-3xl border border-terracotta/40 bg-surface px-8 py-10 text-center sm:px-16">
+            <p className="relative text-sm font-semibold uppercase tracking-widest text-terracotta">Ready to earn?</p>
+            <h3 className="relative mt-2 text-2xl font-extrabold text-charcoal sm:text-3xl">
               Get your referral link in seconds
             </h3>
-            <p className="relative mx-auto mt-2 max-w-md text-sm text-white/75">
+            <p className="relative mx-auto mt-2 max-w-md text-sm text-muted">
               No minimum. No expiry. Every referred order earns you cash — forever.
             </p>
             <div className="relative mt-6 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href="/dashboard"
-                className="rounded-full bg-white px-8 py-3 text-sm font-bold text-terracotta shadow-lg transition-transform hover:scale-[1.04]"
+                className="rounded-full bg-terracotta px-8 py-3 text-sm font-bold text-onaccent transition-colors hover:bg-terracotta-dark"
               >
                 Get my referral link →
               </Link>
               <Link
                 href="/signup"
-                className="rounded-full border border-white/30 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                className="rounded-full border border-line px-8 py-3 text-sm font-semibold text-charcoal transition-colors hover:border-terracotta"
               >
                 Create account first
               </Link>
@@ -463,7 +308,7 @@ export default function HomePage() {
               , title: "Safe packaging", desc: "Each order is packed with care so it arrives in perfect shape."
             },
           ].map((f) => (
-            <div key={f.title} className="rounded-2xl border border-line bg-white p-8 shadow-sm">
+            <div key={f.title} className="rounded-2xl border border-line bg-surface p-8 shadow-sm">
               <div className="text-3xl">{f.icon}</div>
               <h3 className="mt-4 text-lg font-semibold text-charcoal">{f.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{f.desc}</p>
@@ -480,7 +325,7 @@ export default function HomePage() {
       {/* Final CTA */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-terracotta to-terracotta-dark px-8 py-14 text-center shadow-xl sm:px-16">
-          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-surface/10 blur-2xl" />
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
             Ready to make your memories magnetic?
           </h2>
@@ -489,7 +334,7 @@ export default function HomePage() {
           </p>
           <Link
             href="/products/custom-magnets"
-            className="mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-base font-semibold text-terracotta shadow-lg transition-transform hover:scale-[1.03]"
+            className="mt-8 inline-block rounded-full bg-surface px-8 py-3.5 text-base font-semibold text-terracotta shadow-lg transition-transform hover:scale-[1.03]"
           >
             Start creating
           </Link>

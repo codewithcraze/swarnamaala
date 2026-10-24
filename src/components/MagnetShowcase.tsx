@@ -24,13 +24,13 @@ export default function MagnetShowcase() {
             so the magnet stays centred on small screens. */}
         <div ref={stageRef} className="relative h-[280px] w-full min-w-0 overflow-hidden sm:h-[400px] lg:h-[460px]">
           <div className="absolute inset-0">
-            {mounted && <MagnetScene image="/family.avif" active={visible} />}
+            {mounted && <MagnetScene image="/showcase.jpg" active={visible} />}
           </div>
         </div>
 
         {/* Copy */}
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-terracotta">
+          <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-terracotta">
             See it in 3D
           </span>
           <h2 className="mt-5 text-3xl font-extrabold leading-tight text-charcoal sm:text-4xl">
@@ -58,7 +58,7 @@ export default function MagnetShowcase() {
           </ul>
           <Link
             href="/products/custom-magnets"
-            className="mt-8 inline-block rounded-full bg-terracotta px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-terracotta/25 transition-colors hover:bg-terracotta-dark"
+            className="mt-8 inline-block rounded-full bg-terracotta px-8 py-3.5 text-base font-semibold text-onaccent shadow-lg shadow-terracotta/25 transition-colors hover:bg-terracotta-dark"
           >
             Make yours from {CURRENCY_SYMBOL}299
           </Link>

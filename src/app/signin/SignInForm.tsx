@@ -33,7 +33,7 @@ export default function SignInForm() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12">
-      <div className="rounded-3xl border border-line bg-white p-8 shadow-sm">
+      <div className="rounded-3xl border border-line bg-surface p-8 shadow-sm">
         <h1 className="text-2xl font-bold text-charcoal">Welcome back</h1>
         <p className="mt-1 text-sm text-muted">Sign in to place your order.</p>
 
@@ -62,13 +62,13 @@ export default function SignInForm() {
           </label>
 
           {error && (
-            <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>
+            <p className="rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60"
+            className="w-full rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-onaccent shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>

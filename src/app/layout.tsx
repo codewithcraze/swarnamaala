@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | swarnamaala.in",
   },
   description:
-    "Create premium personalised custom photo magnets online. Upload your favourite pictures, choose a pack of 1, 3, 6 or 10 magnets from just \u20B999, and get them delivered across India.",
+    "Create premium personalised custom photo magnets online. Upload your favourite pictures, choose a pack of 6, 12 or 18 magnets from just \u20B9299, and get them delivered across India.",
   keywords: [
     "custom magnets",
     "custom photo magnets",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FFF8F2",
+  themeColor: "#110D0A",
   width: "device-width",
   initialScale: 1,
 };

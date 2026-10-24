@@ -36,7 +36,7 @@ export default function ProductImageCarousel({
   }
 
   return (
-    <div className="sticky top-24 rounded-3xl border border-line bg-white p-4 shadow-sm">
+    <div className="sticky top-24 rounded-3xl border border-line bg-surface p-4 shadow-sm">
       {/* Main view */}
       <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-cream">
         <Image
@@ -54,7 +54,7 @@ export default function ProductImageCarousel({
 
         {/* Uploading overlay */}
         {uploading && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/70 backdrop-blur-sm">
+          <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-surface/70 backdrop-blur-sm">
             <div className="flex flex-col items-center gap-3">
               <svg className="h-8 w-8 animate-spin text-terracotta" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
@@ -89,7 +89,7 @@ export default function ProductImageCarousel({
               type="button"
               onClick={prevSlide}
               aria-label="Previous magnet"
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-1.5 shadow transition hover:bg-white"
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-surface/90 p-1.5 shadow transition hover:bg-surface"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="m15 18-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -99,7 +99,7 @@ export default function ProductImageCarousel({
               type="button"
               onClick={nextSlide}
               aria-label="Next magnet"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-1.5 shadow transition hover:bg-white"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-surface/90 p-1.5 shadow transition hover:bg-surface"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="m9 18 6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />

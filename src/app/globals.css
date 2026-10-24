@@ -1,21 +1,29 @@
 @import "tailwindcss";
 
+/* Dark luxury theme: espresso-black canvas, ivory type, antique-gold accents.
+   Token names are kept from the original light theme so every component
+   picks up the new palette:
+   cream = page background, surface = cards, charcoal = primary text,
+   terracotta = primary gold accent, gold = soft champagne highlight,
+   onaccent = text placed on gold fills. */
 @theme {
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
-  --color-cream: #fff8f2;
-  --color-surface: #ffffff;
-  --color-terracotta: #d97757;
-  --color-terracotta-dark: #c4623f;
-  --color-charcoal: #2e2e2e;
-  --color-muted: #7c736b;
-  --color-gold: #f4b942;
-  --color-line: #efe1d2;
+  --color-cream: #110d0a;
+  --color-surface: #1b1612;
+  --color-terracotta: #c9a14a;
+  --color-terracotta-dark: #dfbd6c;
+  --color-charcoal: #f4ece0;
+  --color-muted: #a89c8b;
+  --color-gold: #e8cf8f;
+  --color-line: #362d25;
+  --color-onaccent: #1a130b;
 }
 
 :root {
-  --background: #fff8f2;
-  --foreground: #2e2e2e;
+  --background: #110d0a;
+  --foreground: #f4ece0;
+  color-scheme: dark;
 }
 
 * {
@@ -28,13 +36,13 @@ html {
 }
 
 body {
-  background-color: #fff8f2;
+  background-color: #110d0a;
   background-image: radial-gradient(
       48rem 48rem at 88% -8%,
-      rgba(217, 119, 87, 0.1),
+      rgba(201, 161, 74, 0.1),
       transparent 60%
     ),
-    radial-gradient(40rem 40rem at -6% 12%, rgba(244, 185, 66, 0.12), transparent 58%);
+    radial-gradient(40rem 40rem at -6% 12%, rgba(232, 207, 143, 0.06), transparent 58%);
   background-attachment: fixed;
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
@@ -48,7 +56,7 @@ body {
   width: 100%;
   border-radius: 0.7rem;
   border: 1px solid var(--color-line);
-  background: #ffffff;
+  background: var(--color-surface);
   padding: 0.65rem 0.9rem;
   font-size: 0.9rem;
   color: var(--foreground);
@@ -56,11 +64,11 @@ body {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .input::placeholder {
-  color: rgba(124, 115, 107, 0.7);
+  color: rgba(168, 156, 139, 0.6);
 }
 .input:focus {
   border-color: var(--color-terracotta);
-  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.2);
+  box-shadow: 0 0 0 3px rgba(201, 161, 74, 0.22);
 }
 
 /* Utility: hide scrollbar for horizontal galleries */
@@ -147,7 +155,7 @@ body {
   color: var(--color-charcoal);
 }
 .prose p {
-  color: #4a443d;
+  color: #cfc4b4;
 }
 .prose a {
   color: var(--color-terracotta);
@@ -178,4 +186,92 @@ body {
 }
 .prose strong {
   color: var(--color-charcoal);
+}
+
+/* ---- Steps timeline: dashed track that slowly fills with gold ---- */
+.steps-track::before,
+.steps-track::after {
+  content: "";
+  position: absolute;
+  border-radius: 3px;
+  pointer-events: none;
+}
+/* Mobile: vertical track down the left, behind the step numbers. */
+.steps-track::before,
+.steps-track::after {
+  top: 22px;
+  bottom: 22px;
+  left: 21px;
+  width: 3px;
+}
+.steps-track::before {
+  background: repeating-linear-gradient(180deg, var(--color-line) 0 8px, transparent 8px 16px);
+}
+.steps-track::after {
+  background: var(--color-terracotta);
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform var(--fill-ms, 3600ms) cubic-bezier(0.6, 0.1, 0.2, 1);
+}
+.steps-track.go::after {
+  transform: scaleY(1);
+}
+/* Desktop: horizontal track through the step numbers. */
+@media (min-width: 768px) {
+  .steps-track::before,
+  .steps-track::after {
+    top: 21px;
+    bottom: auto;
+    left: 22px;
+    right: 22px;
+    width: auto;
+    height: 3px;
+  }
+  .steps-track::before {
+    background: repeating-linear-gradient(90deg, var(--color-line) 0 8px, transparent 8px 16px);
+  }
+  .steps-track::after {
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  .steps-track.go::after {
+    transform: scaleX(1);
+  }
+}
+/* Step number: starts muted, turns gold when the line reaches it. */
+.step-node {
+  background: var(--color-surface);
+  color: var(--color-muted);
+  border: 2px solid var(--color-line);
+  box-shadow: 0 0 0 8px var(--color-cream);
+  transition: background 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+}
+.steps-track.go .step-node {
+  background: var(--color-terracotta);
+  color: var(--color-onaccent);
+  border-color: var(--color-terracotta);
+}
+/* Illustration fades up as its step is reached. */
+.step-art {
+  opacity: 0.35;
+  transform: translateY(10px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.steps-track.go .step-art {
+  opacity: 1;
+  transform: none;
+}
+.step-pulse {
+  animation: step-pulse 4s infinite;
+}
+@keyframes step-pulse {
+  0%, 40% { opacity: 1; }
+  50%, 90% { opacity: 0.25; }
+  100% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .steps-track::after { transition: none; transform: none !important; }
+  .step-node, .step-art { transition: none; }
+  .step-art { opacity: 1; transform: none; }
+  .step-pulse { animation: none; }
 }

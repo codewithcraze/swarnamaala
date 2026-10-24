@@ -34,10 +34,10 @@ function initials(name: string) {
 
 function TestimonialCard({ review }: { review: Review }) {
   return (
-    <figure className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+    <figure className="rounded-2xl border border-line bg-surface p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-terracotta to-terracotta-dark text-xs font-semibold text-white">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-terracotta to-terracotta-dark text-xs font-semibold text-onaccent">
             {initials(review.name)}
           </div>
           <div className="min-w-0">

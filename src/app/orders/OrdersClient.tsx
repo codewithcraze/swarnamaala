@@ -37,13 +37,13 @@ const ORDER_STATUS_STYLES: Record<string, string> = {
   pending: "bg-gold/20 text-terracotta-dark",
   processing: "bg-sky-100 text-sky-700",
   shipped: "bg-indigo-100 text-indigo-700",
-  delivered: "bg-emerald-100 text-emerald-700",
-  cancelled: "bg-red-100 text-red-600",
+  delivered: "bg-emerald-100 text-emerald-400",
+  cancelled: "bg-red-100 text-red-400",
 };
 
 const PAYMENT_STATUS_STYLES: Record<string, string> = {
-  unpaid: "bg-red-50 text-red-600 border-red-200",
-  paid: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  unpaid: "bg-red-500/10 text-red-400 border-red-200",
+  paid: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
   failed: "bg-orange-50 text-orange-700 border-orange-200",
   refunded: "bg-gold/20 text-terracotta-dark border-gold/40",
 };
@@ -200,11 +200,11 @@ export default function OrdersClient() {
 
       {/* Success banner */}
       {showSuccess && (
-        <div className="mb-6 flex items-start gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+        <div className="mb-6 flex items-start gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
           <span className="text-2xl">🎉</span>
           <div>
-            <p className="font-semibold text-emerald-700">Order placed &amp; payment confirmed!</p>
-            <p className="mt-1 text-sm text-emerald-600">
+            <p className="font-semibold text-emerald-400">Order placed &amp; payment confirmed!</p>
+            <p className="mt-1 text-sm text-emerald-300">
               We&apos;ve received your order. Sit back — we&apos;ll start printing right away.
             </p>
           </div>
@@ -233,7 +233,7 @@ export default function OrdersClient() {
               const order = orders.find((o) => o._id === pendingOrderId);
               if (order) handlePayNow(order);
             }}
-            className="shrink-0 rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-dark"
+            className="shrink-0 rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-onaccent hover:bg-terracotta-dark"
           >
             Pay Now
           </button>
@@ -242,8 +242,8 @@ export default function OrdersClient() {
 
       {/* Global pay error */}
       {payError && (
-        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4">
-          <p className="text-sm font-medium text-red-600">{payError}</p>
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-500/10 p-4">
+          <p className="text-sm font-medium text-red-400">{payError}</p>
           <button onClick={() => setPayError("")} className="mt-1 text-xs text-red-400 hover:underline">
             Dismiss
           </button>
@@ -254,20 +254,20 @@ export default function OrdersClient() {
         <h1 className="text-3xl font-bold text-charcoal">My Orders</h1>
         <Link
           href="/products/custom-magnets"
-          className="rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-terracotta-dark"
+          className="rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-onaccent transition-colors hover:bg-terracotta-dark"
         >
           + New order
         </Link>
       </div>
 
       {orders.length === 0 ? (
-        <div className="mt-12 rounded-3xl border border-line bg-white p-12 text-center shadow-sm">
+        <div className="mt-12 rounded-3xl border border-line bg-surface p-12 text-center shadow-sm">
           <div className="text-5xl">🧲</div>
           <p className="mt-4 text-lg font-semibold text-charcoal">No orders yet</p>
           <p className="mt-1 text-sm text-muted">Upload your photos and create your first custom magnet.</p>
           <Link
             href="/products/custom-magnets"
-            className="mt-6 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-white hover:bg-terracotta-dark"
+            className="mt-6 inline-block rounded-full bg-terracotta px-6 py-2.5 text-sm font-semibold text-onaccent hover:bg-terracotta-dark"
           >
             Start creating
           </Link>
@@ -285,7 +285,7 @@ export default function OrdersClient() {
             return (
               <div
                 key={order._id}
-                className={`rounded-2xl border bg-white shadow-sm transition-shadow hover:shadow-md ${
+                className={`rounded-2xl border bg-surface shadow-sm transition-shadow hover:shadow-md ${
                   isUnpaid && !isCancelled ? "border-terracotta/40" : "border-line"
                 }`}
               >
@@ -355,7 +355,7 @@ export default function OrdersClient() {
                         <button
                           onClick={() => handlePayNow(order)}
                           disabled={payingId === order._id}
-                          className="flex items-center gap-1.5 rounded-full bg-terracotta px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60"
+                          className="flex items-center gap-1.5 rounded-full bg-terracotta px-4 py-2 text-xs font-bold text-onaccent shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60"
                         >
                           {payingId === order._id ? (
                             <>
@@ -375,7 +375,7 @@ export default function OrdersClient() {
                       {isPending && isUnpaid && (
                         <Link
                           href={`/orders/${order._id}/edit`}
-                          className="rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold text-charcoal hover:bg-cream"
+                          className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold text-charcoal hover:bg-cream"
                         >
                           Edit
                         </Link>
@@ -386,7 +386,7 @@ export default function OrdersClient() {
                         <button
                           onClick={() => handleCancel(order._id)}
                           disabled={cancellingId === order._id}
-                          className="rounded-full border border-red-200 bg-red-50 px-4 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 disabled:opacity-50"
+                          className="rounded-full border border-red-200 bg-red-500/10 px-4 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-100 disabled:opacity-50"
                         >
                           {cancellingId === order._id ? "Cancelling…" : "Cancel"}
                         </button>

@@ -332,11 +332,11 @@ export default function ProductConfigurator() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href={`/signin?redirect=${PRODUCT_PATH}`}
-              className="rounded-full bg-terracotta px-5 py-2 text-sm font-semibold text-white whitespace-nowrap">
+              className="rounded-full bg-terracotta px-5 py-2 text-sm font-semibold text-onaccent whitespace-nowrap">
               Sign in
             </Link>
             <Link href={`/signup?redirect=${PRODUCT_PATH}`}
-              className="rounded-full border border-line bg-white px-5 py-2 text-sm font-semibold text-charcoal whitespace-nowrap">
+              className="rounded-full border border-line bg-surface px-5 py-2 text-sm font-semibold text-charcoal whitespace-nowrap">
               Create account
             </Link>
           </div>
@@ -367,7 +367,7 @@ export default function ProductConfigurator() {
                       className={`flex items-center gap-1.5 sm:gap-2 ${isDone ? "cursor-pointer" : "cursor-default"}`}
                     >
                       <span className={`grid h-7 w-7 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-full text-xs sm:text-sm font-semibold transition-colors
-                        ${isDone ? "bg-terracotta text-white" : isActive ? "border-2 border-terracotta bg-white text-terracotta" : "border border-line bg-white text-muted"}`}>
+                        ${isDone ? "bg-terracotta text-onaccent" : isActive ? "border-2 border-terracotta bg-surface text-terracotta" : "border border-line bg-surface text-muted"}`}>
                         {isDone ? (
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="sm:w-4 sm:h-4">
                             <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
@@ -413,17 +413,17 @@ export default function ProductConfigurator() {
             )}
 
             {error && step !== 4 && (
-              <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>
+              <p className="rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
             )}
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
               <button type="button" onClick={handleBack} disabled={step === 1}
-                className="cursor-pointer rounded-full border border-line bg-white px-5 py-2.5 text-sm font-semibold text-charcoal transition-colors hover:bg-cream disabled:invisible">
+                className="cursor-pointer rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-semibold text-charcoal transition-colors hover:bg-cream disabled:invisible">
                 ← Back
               </button>
               {step !== 4 ? (
                 <button type="button" onClick={handleNext} disabled={uploading}
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-terracotta px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60 whitespace-nowrap">
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-terracotta px-7 py-2.5 text-sm font-semibold text-onaccent shadow-sm transition-colors hover:bg-terracotta-dark disabled:opacity-60 whitespace-nowrap">
                   {uploading && <Spinner />}
                   {uploading ? `Uploading ${pendingCount > 1 ? `${pendingCount} photos` : "photo"}…` : "Continue →"}
                 </button>
@@ -479,10 +479,10 @@ function Step1({ quantity, setQuantity, isCustom, setCustomQuantity, pricing }: 
         {PRICING_TIERS.map((t) => (
           <button key={t.quantity} type="button" onClick={() => setQuantity(t.quantity)}
             className={`relative rounded-xl border p-3 sm:p-4 text-center cursor-pointer transition-all ${
-              quantity === t.quantity ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-white hover:border-terracotta/50"
+              quantity === t.quantity ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-surface hover:border-terracotta/50"
             }`}>
             {t.badge && (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-terracotta px-2 sm:px-2.5 py-0.5 text-[10px] font-semibold text-white">
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-terracotta px-2 sm:px-2.5 py-0.5 text-[10px] font-semibold text-onaccent">
                 {t.badge}
               </span>
             )}
@@ -493,19 +493,19 @@ function Step1({ quantity, setQuantity, isCustom, setCustomQuantity, pricing }: 
           </button>
         ))}
       </div>
-      <div className={`mt-3 flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 rounded-xl border p-4 ${isCustom ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-white"}`}>
+      <div className={`mt-3 flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 rounded-xl border p-4 ${isCustom ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-surface"}`}>
         <div>
           <p className="text-sm font-semibold text-charcoal">Need more than 18?</p>
           <p className="text-xs text-muted">Add up to {MAX_QUANTITY} — each extra magnet just {CURRENCY_SYMBOL}{EXTRA_MAGNET_PRICE}</p>
         </div>
         <div className="flex items-center gap-2">
           <button type="button" onClick={() => setCustomQuantity((isCustom ? quantity : 19) - 1)}
-            className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-white text-lg hover:bg-cream shrink-0">−</button>
+            className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-surface text-lg hover:bg-cream shrink-0">−</button>
           <input type="number" min={19} max={MAX_QUANTITY} value={isCustom ? quantity : ""}
             placeholder="19+" onChange={(e) => setCustomQuantity(Number(e.target.value))}
             className="input w-16 sm:w-20 text-center" />
           <button type="button" onClick={() => setCustomQuantity((isCustom ? quantity : 18) + 1)}
-            className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-white text-lg hover:bg-cream shrink-0">+</button>
+            className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-surface text-lg hover:bg-cream shrink-0">+</button>
         </div>
       </div>
       <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-xl border border-line bg-cream/60 px-4 py-3 text-sm">
@@ -543,9 +543,9 @@ function Step2({ quantity, images, uploading, pendingCount, remaining, needsLogi
           </p>
           <div className="flex gap-2">
             <Link href={`/signin?redirect=${PRODUCT_PATH}`}
-              className="rounded-full bg-terracotta px-4 py-2 text-xs font-semibold text-white">Sign in</Link>
+              className="rounded-full bg-terracotta px-4 py-2 text-xs font-semibold text-onaccent">Sign in</Link>
             <Link href={`/signup?redirect=${PRODUCT_PATH}`}
-              className="rounded-full border border-line bg-white px-4 py-2 text-xs font-semibold text-charcoal">Create account</Link>
+              className="rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold text-charcoal">Create account</Link>
           </div>
         </div>
       )}
@@ -587,7 +587,7 @@ function Step2({ quantity, images, uploading, pendingCount, remaining, needsLogi
           );
           return (
             <button key={i} type="button" onClick={openPicker} disabled={uploading}
-              className="grid aspect-square cursor-pointer place-items-center rounded-xl border-2 border-dashed border-line bg-white text-muted hover:border-terracotta/60 hover:text-terracotta disabled:opacity-60 transition-colors">
+              className="grid aspect-square cursor-pointer place-items-center rounded-xl border-2 border-dashed border-line bg-surface text-muted hover:border-terracotta/60 hover:text-terracotta disabled:opacity-60 transition-colors">
               <span className="text-center text-xs"><span className="block text-xl font-bold">+</span>Add</span>
             </button>
           );
@@ -596,13 +596,13 @@ function Step2({ quantity, images, uploading, pendingCount, remaining, needsLogi
 
       <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
         <button type="button" onClick={openPicker} disabled={uploading || remaining <= 0}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-xs font-semibold text-charcoal hover:bg-cream disabled:opacity-50 transition-colors whitespace-nowrap">
+          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold text-charcoal hover:bg-cream disabled:opacity-50 transition-colors whitespace-nowrap">
           {uploading && <Spinner />}
           {uploading ? `Uploading ${pendingCount > 1 ? `${pendingCount} photos` : "photo"}…` : "📁 Upload photos"}
         </button>
         {images.length > 0 && quantity > 1 && (
           <button type="button" onClick={() => useForAll(images[0])}
-            className="cursor-pointer rounded-full border border-line bg-white px-4 py-2 text-xs font-semibold text-charcoal hover:bg-cream transition-colors whitespace-nowrap">
+            className="cursor-pointer rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold text-charcoal hover:bg-cream transition-colors whitespace-nowrap">
             Use #1 for all {quantity}
           </button>
         )}
@@ -664,7 +664,7 @@ function PaymentMethodStep({ paymentMethod, setPaymentMethod, codFee }: {
       <h2 className="text-sm font-semibold uppercase tracking-wide text-terracotta">4. Payment method</h2>
       <div className="mt-3 space-y-2 sm:space-y-3">
         <label className={`flex cursor-pointer items-center gap-3 sm:gap-4 rounded-xl border p-3 sm:p-4 transition-all ${
-          paymentMethod === "online" ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-white hover:border-terracotta/50"
+          paymentMethod === "online" ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-surface hover:border-terracotta/50"
         }`}>
           <input
             type="radio"
@@ -678,13 +678,13 @@ function PaymentMethodStep({ paymentMethod, setPaymentMethod, codFee }: {
             <p className="font-semibold text-charcoal text-sm sm:text-base">Online payment</p>
             <p className="text-xs text-muted">UPI, Cards, Net Banking · No extra charge</p>
           </div>
-          <span className="hidden sm:inline-block rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 whitespace-nowrap">
+          <span className="hidden sm:inline-block rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 whitespace-nowrap">
             Recommended
           </span>
         </label>
 
         <label className={`flex cursor-pointer items-center gap-3 sm:gap-4 rounded-xl border p-3 sm:p-4 transition-all ${
-          paymentMethod === "cod" ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-white hover:border-terracotta/50"
+          paymentMethod === "cod" ? "border-terracotta bg-terracotta/10 ring-2 ring-terracotta/30" : "border-line bg-surface hover:border-terracotta/50"
         }`}>
           <input
             type="radio"
@@ -725,7 +725,7 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
   const afterDiscount = appliedCoupon ? appliedCoupon.finalTotal : pricing.total;
   const payable = afterDiscount + (isCod ? codFee : 0);
   return (
-    <div className="rounded-2xl border border-line bg-white p-4 sm:p-5 shadow-sm">
+    <div className="rounded-2xl border border-line bg-surface p-4 sm:p-5 shadow-sm">
       <h3 className="mb-3 text-sm sm:text-base font-semibold text-charcoal">Order summary</h3>
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted text-xs sm:text-sm">{quantityLabel(quantity)}</span>
@@ -735,10 +735,10 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
       {/* Coupon code */}
       <div className="mt-3 sm:mt-4 border-t border-line pt-3 sm:pt-4">
         {appliedCoupon ? (
-          <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2">
+          <div className="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
             <div className="text-xs sm:text-sm">
-              <span className="font-semibold text-emerald-700">{appliedCoupon.code}</span>
-              <span className="ml-2 text-emerald-600">applied</span>
+              <span className="font-semibold text-emerald-400">{appliedCoupon.code}</span>
+              <span className="ml-2 text-emerald-300">applied</span>
             </div>
             <button type="button" onClick={removeCoupon}
               className="cursor-pointer text-xs font-medium text-muted hover:text-red-500">
@@ -755,18 +755,18 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
               className="input flex-1 text-sm"
             />
             <button type="button" onClick={applyCoupon} disabled={couponLoading}
-              className="cursor-pointer rounded-full border border-terracotta bg-white px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold text-terracotta hover:bg-terracotta/10 disabled:opacity-60 whitespace-nowrap">
+              className="cursor-pointer rounded-full border border-terracotta bg-surface px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold text-terracotta hover:bg-terracotta/10 disabled:opacity-60 whitespace-nowrap">
               {couponLoading ? "…" : "Apply"}
             </button>
           </div>
         )}
-        {couponError && <p className="mt-2 text-xs text-red-600">{couponError}</p>}
+        {couponError && <p className="mt-2 text-xs text-red-400">{couponError}</p>}
       </div>
 
       {appliedCoupon && (
         <div className="mt-2 sm:mt-3 flex items-center justify-between text-xs sm:text-sm">
-          <span className="text-emerald-700">Discount</span>
-          <span className="font-medium text-emerald-700">
+          <span className="text-emerald-400">Discount</span>
+          <span className="font-medium text-emerald-400">
             &minus;{CURRENCY_SYMBOL}{appliedCoupon.discount}
           </span>
         </div>
@@ -784,13 +784,13 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
         <span className="text-xl sm:text-2xl font-extrabold text-terracotta">{CURRENCY_SYMBOL}{payable}</span>
       </div>
 
-      {error && <p className="mt-3 sm:mt-4 rounded-lg bg-red-50 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-3 sm:mt-4 rounded-lg bg-red-500/10 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-red-400">{error}</p>}
 
       <button
         type="button"
         onClick={onPay}
         disabled={submitting || uploading || !user}
-        className="mt-3 sm:mt-4 w-full cursor-pointer rounded-full bg-terracotta px-5 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white shadow-md transition-colors hover:bg-terracotta-dark disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-3 sm:mt-4 w-full cursor-pointer rounded-full bg-terracotta px-5 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-semibold text-onaccent shadow-md transition-colors hover:bg-terracotta-dark disabled:cursor-not-allowed disabled:opacity-60"
       >
         {!user ? "Sign in to place order"
           : submitting ? (isCod ? "Placing order…" : "Processing payment…")
@@ -932,12 +932,12 @@ function CustomerReviews() {
 
       <div className="mt-6 -mx-4 flex snap-x snap-mandatory gap-3 sm:gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-2">
         {CUSTOMER_REVIEWS.map((r, i) => (
-          <div key={i} className="w-[75%] sm:w-auto shrink-0 snap-start overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+          <div key={i} className="w-[75%] sm:w-auto shrink-0 snap-start overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
             <div className="relative aspect-square w-full overflow-hidden bg-cream">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={r.photo} alt={`Magnets received by ${r.name}`} className="h-full w-full object-cover" loading="lazy" />
               {r.verified && (
-                <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[10px] font-semibold text-terracotta shadow-sm">
+                <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-surface/95 px-2 py-1 text-[10px] font-semibold text-terracotta shadow-sm">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                     <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>

@@ -38,7 +38,7 @@ export default async function BlogIndexPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <header className="mx-auto max-w-2xl text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-terracotta">
+        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-terracotta">
           The swarnamaala blog
         </span>
         <h1 className="mt-5 text-3xl font-bold text-charcoal sm:text-4xl">
@@ -50,7 +50,7 @@ export default async function BlogIndexPage() {
       </header>
 
       {posts.length === 0 ? (
-        <div className="mt-12 rounded-3xl border border-line bg-white p-12 text-center text-muted shadow-sm">
+        <div className="mt-12 rounded-3xl border border-line bg-surface p-12 text-center text-muted shadow-sm">
           No posts yet — check back soon!
         </div>
       ) : (
@@ -59,7 +59,7 @@ export default async function BlogIndexPage() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition-shadow hover:shadow-md"
+              className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-cream">
                 {post.coverImage ? (
