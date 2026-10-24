@@ -1,14 +1,41 @@
 @import "tailwindcss";
 
-/* Dark luxury theme: espresso-black canvas, ivory type, antique-gold accents.
-   Token names are kept from the original light theme so every component
-   picks up the new palette:
+/* Two luxury themes sharing one set of tokens. Light (ivory + deep antique
+   gold) is the default; dark (espresso + champagne gold) applies when
+   <html data-theme="dark">. Token names are kept from the original theme:
    cream = page background, surface = cards, charcoal = primary text,
-   terracotta = primary gold accent, gold = soft champagne highlight,
+   terracotta = primary gold accent, gold = soft highlight,
    onaccent = text placed on gold fills. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
+  /* Light (default). Gold is deepened so it passes contrast as text on ivory. */
+  --color-cream: #f8f3ec;
+  --color-surface: #ffffff;
+  --color-terracotta: #8c6a22;
+  --color-terracotta-dark: #74561a;
+  --color-charcoal: #231c15;
+  --color-muted: #6c6156;
+  --color-gold: #b58d3a;
+  --color-line: #e6dccd;
+  --color-onaccent: #ffffff;
+}
+
+:root {
+  --background: #f8f3ec;
+  --foreground: #231c15;
+  --glow-a: rgba(181, 141, 58, 0.12);
+  --glow-b: rgba(181, 141, 58, 0.07);
+  --placeholder: rgba(108, 97, 86, 0.6);
+  --focus-ring: rgba(140, 106, 34, 0.22);
+  --prose-text: #4a4036;
+  --shimmer: 140, 106, 34;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
   --color-cream: #110d0a;
   --color-surface: #1b1612;
   --color-terracotta: #c9a14a;
@@ -18,11 +45,15 @@
   --color-gold: #e8cf8f;
   --color-line: #362d25;
   --color-onaccent: #1a130b;
-}
 
-:root {
   --background: #110d0a;
   --foreground: #f4ece0;
+  --glow-a: rgba(201, 161, 74, 0.1);
+  --glow-b: rgba(232, 207, 143, 0.06);
+  --placeholder: rgba(168, 156, 139, 0.6);
+  --focus-ring: rgba(201, 161, 74, 0.22);
+  --prose-text: #cfc4b4;
+  --shimmer: 232, 207, 143;
   color-scheme: dark;
 }
 
@@ -36,13 +67,9 @@ html {
 }
 
 body {
-  background-color: #110d0a;
-  background-image: radial-gradient(
-      48rem 48rem at 88% -8%,
-      rgba(201, 161, 74, 0.1),
-      transparent 60%
-    ),
-    radial-gradient(40rem 40rem at -6% 12%, rgba(232, 207, 143, 0.06), transparent 58%);
+  background-color: var(--background);
+  background-image: radial-gradient(48rem 48rem at 88% -8%, var(--glow-a), transparent 60%),
+    radial-gradient(40rem 40rem at -6% 12%, var(--glow-b), transparent 58%);
   background-attachment: fixed;
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
@@ -64,11 +91,11 @@ body {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .input::placeholder {
-  color: rgba(168, 156, 139, 0.6);
+  color: var(--placeholder);
 }
 .input:focus {
   border-color: var(--color-terracotta);
-  box-shadow: 0 0 0 3px rgba(201, 161, 74, 0.22);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 /* Utility: hide scrollbar for horizontal galleries */
@@ -155,7 +182,7 @@ body {
   color: var(--color-charcoal);
 }
 .prose p {
-  color: #cfc4b4;
+  color: var(--prose-text);
 }
 .prose a {
   color: var(--color-terracotta);
@@ -294,9 +321,9 @@ body {
   background: linear-gradient(
     100deg,
     transparent 20%,
-    rgba(232, 207, 143, 0.16) 45%,
-    rgba(232, 207, 143, 0.32) 50%,
-    rgba(232, 207, 143, 0.16) 55%,
+    rgba(var(--shimmer), 0.14) 45%,
+    rgba(var(--shimmer), 0.28) 50%,
+    rgba(var(--shimmer), 0.14) 55%,
     transparent 80%
   );
   animation: shimmer-sweep 1.4s ease-in-out infinite;

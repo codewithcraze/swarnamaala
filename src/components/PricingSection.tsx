@@ -55,7 +55,7 @@ export default function PricingSection() {
             : popular
               ? "bg-surface border-2 border-terracotta"
               : "bg-surface border border-line";
-          const sub = best ? "text-[#6b5f50]" : "text-muted";
+          const sub = best ? "text-onaccent/70" : "text-muted";
           const btn = best
             ? "bg-onaccent text-charcoal hover:bg-terracotta hover:text-onaccent"
             : popular
@@ -90,7 +90,7 @@ export default function PricingSection() {
               {save ? (
                 <p
                   className={`mt-[18px] self-start rounded-full px-3 py-1 text-[13px] font-semibold ${
-                    best ? "bg-terracotta text-onaccent" : "bg-terracotta/15 text-gold"
+                    best ? "bg-terracotta text-onaccent" : "bg-terracotta/15 text-terracotta-dark dark:text-gold"
                   }`}
                 >
                   {save}

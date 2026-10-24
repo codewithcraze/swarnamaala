@@ -445,7 +445,7 @@ export default function ProductConfigurator() {
             )}
 
             {error && step !== 4 && (
-              <p className="rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
+              <p className="rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-600 dark:text-red-400">{error}</p>
             )}
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
@@ -472,7 +472,7 @@ export default function ProductConfigurator() {
           <div className="mt-4 rounded-2xl border border-line bg-cream/60 p-4 text-sm text-muted">
             <p className="font-semibold text-charcoal">Have questions?</p>
             <p className="mt-1">Chat with us on WhatsApp for instant help.</p>
-            <a href="https://wa.me/919084248821" target="_blank" rel="noopener noreferrer"
+            <a href="https://wa.me/918368059837" target="_blank" rel="noopener noreferrer"
               className="mt-3 flex items-center justify-center gap-2 rounded-full bg-[#25D366] py-2.5 text-sm font-semibold text-white hover:bg-[#20BD5A] transition-colors">
               <svg viewBox="0 0 32 32" className="h-4 w-4 fill-white" aria-hidden="true">
                 <path d="M16.003 3.2C9.004 3.2 3.2 9.004 3.2 16.003c0 2.29.597 4.435 1.64 6.296L3.2 28.8l6.683-1.614A12.7 12.7 0 0 0 16.003 28.8c6.999 0 12.797-5.804 12.797-12.797C28.8 9.004 23.002 3.2 16.003 3.2zm6.3 17.87c-.264.742-1.542 1.458-2.11 1.497-.568.04-1.106.274-3.725-.777-3.15-1.263-5.146-4.42-5.302-4.623-.155-.203-1.268-1.687-1.268-3.22s.802-2.286 1.087-2.599c.284-.313.62-.392.826-.392s.412.003.592.01c.19.008.445-.072.697.533.258.617.876 2.13.955 2.285.08.154.133.334.026.537-.104.203-.156.33-.31.508-.154.18-.324.4-.463.537-.154.151-.313.316-.135.62.178.303.794 1.31 1.706 2.12 1.174 1.048 2.163 1.372 2.466 1.527.303.154.48.13.656-.078.179-.207.759-.885 1.361-1.764l.025-.037c.21-.33.42-.276.7-.166.283.11 1.79.845 2.097.997.308.154.514.228.59.357.077.13.077.745-.187 1.487z" />
@@ -770,7 +770,7 @@ function PaymentMethodStep({ paymentMethod, setPaymentMethod, codFee }: {
             <p className="font-semibold text-charcoal text-sm sm:text-base">Online payment</p>
             <p className="text-xs text-muted">UPI, Cards, Net Banking · No extra charge</p>
           </div>
-          <span className="hidden sm:inline-block rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 whitespace-nowrap">
+          <span className="hidden sm:inline-block rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
             Recommended
           </span>
         </label>
@@ -829,8 +829,8 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
         {appliedCoupon ? (
           <div className="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
             <div className="text-xs sm:text-sm">
-              <span className="font-semibold text-emerald-400">{appliedCoupon.code}</span>
-              <span className="ml-2 text-emerald-300">applied</span>
+              <span className="font-semibold text-emerald-700 dark:text-emerald-400">{appliedCoupon.code}</span>
+              <span className="ml-2 text-emerald-600 dark:text-emerald-300">applied</span>
             </div>
             <button type="button" onClick={removeCoupon}
               className="cursor-pointer text-xs font-medium text-muted hover:text-red-500">
@@ -852,13 +852,13 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
             </button>
           </div>
         )}
-        {couponError && <p className="mt-2 text-xs text-red-400">{couponError}</p>}
+        {couponError && <p className="mt-2 text-xs text-red-600 dark:text-red-400">{couponError}</p>}
       </div>
 
       {appliedCoupon && (
         <div className="mt-2 sm:mt-3 flex items-center justify-between text-xs sm:text-sm">
-          <span className="text-emerald-400">Discount</span>
-          <span className="font-medium text-emerald-400">
+          <span className="text-emerald-700 dark:text-emerald-400">Discount</span>
+          <span className="font-medium text-emerald-700 dark:text-emerald-400">
             &minus;{CURRENCY_SYMBOL}{appliedCoupon.discount}
           </span>
         </div>
@@ -876,7 +876,7 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
         <span className="text-xl sm:text-2xl font-extrabold text-terracotta">{CURRENCY_SYMBOL}{payable}</span>
       </div>
 
-      {error && <p className="mt-3 sm:mt-4 rounded-lg bg-red-500/10 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-red-400">{error}</p>}
+      {error && <p className="mt-3 sm:mt-4 rounded-lg bg-red-500/10 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-red-600 dark:text-red-400">{error}</p>}
 
       <button
         type="button"
@@ -919,7 +919,7 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
       {!isCod && (
         <p className="mt-2 text-center text-[10px] text-muted/70">
           Powered by{" "}
-          <span className="font-semibold text-[#072654]">Razorpay</span>
+          <span className="font-semibold text-[#072654] dark:text-[#9db8ff]">Razorpay</span>
           &nbsp;· Your payment is encrypted &amp; secure
         </p>
       )}
@@ -958,7 +958,7 @@ function CustomerReviews() {
         ))}
       </div>
 
-      <BannerCarousel />
+      {/* <BannerCarousel /> */}
     </section>
   );
 }

@@ -120,7 +120,7 @@ export default async function BlogPostPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
 
-      <div className="mt-12 rounded-2xl border border-line bg-[#fdf1e6] p-6 text-center">
+      <div className="mt-12 rounded-2xl border border-line bg-terracotta/10 p-6 text-center">
         <h2 className="text-lg font-semibold text-charcoal">Turn your memories into magnets</h2>
         <p className="mt-1 text-sm text-muted">Premium custom photo magnets, delivered across India.</p>
         <Link

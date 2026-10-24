@@ -152,7 +152,7 @@ export default function OrdersClient() {
       )}
 
       {error && (
-        <div className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+        <div className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
           {error}
           <button onClick={() => setError("")} className="text-xs underline">Dismiss</button>
         </div>
@@ -270,7 +270,7 @@ export default function OrdersClient() {
                       <button
                         onClick={() => cancel(o)}
                         disabled={busyId === o._id}
-                        className={`${btn} flex-1 text-red-400 hover:border-red-400 hover:bg-red-500/10 sm:flex-none`}
+                        className={`${btn} flex-1 text-red-600 dark:text-red-400 hover:border-red-400 hover:bg-red-500/10 sm:flex-none`}
                       >
                         Cancel
                       </button>

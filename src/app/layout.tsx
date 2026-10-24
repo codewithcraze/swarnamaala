@@ -4,7 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppFAB from "@/components/WhatsAppFAB";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#110D0A",
+  themeColor: "#F8F3EC",
   width: "device-width",
   initialScale: 1,
 };
@@ -91,7 +91,12 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={poppins.variable}>
+    // data-theme is set by the inline script before paint; suppress the
+    // expected server/client attribute mismatch on <html>.
+    <html lang="en" className={poppins.variable} data-theme="light" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="font-sans antialiased">
         <script
           type="application/ld+json"

@@ -62,7 +62,7 @@ export default function SignInForm() {
           </label>
 
           {error && (
-            <p className="rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
+            <p className="rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-600 dark:text-red-400">{error}</p>
           )}
 
           <button

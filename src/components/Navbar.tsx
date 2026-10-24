@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import Logo from "./Logo";
+import ThemeToggle from "./ThemeToggle";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -49,6 +50,7 @@ export default function Navbar() {
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
+            <ThemeToggle />
             {!loading && user ? (
               <>
                 <Link
@@ -88,8 +90,10 @@ export default function Navbar() {
             )}
           </div>
 
+          <div className="flex items-center gap-1 lg:hidden">
+          <ThemeToggle />
           <button
-            className="grid h-11 w-11 cursor-pointer place-items-center rounded-lg text-charcoal lg:hidden"
+            className="grid h-11 w-11 cursor-pointer place-items-center rounded-lg text-charcoal"
             onClick={() => setOpen((v) => !v)}
             aria-label="Toggle menu"
             aria-expanded={open}
@@ -102,6 +106,7 @@ export default function Navbar() {
               )}
             </svg>
           </button>
+          </div>
         </nav>
       </header>
 

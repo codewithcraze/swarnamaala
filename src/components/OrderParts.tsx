@@ -3,9 +3,9 @@ import { STATE_LABEL, timeline, type OrderLike, type ViewState } from "@/lib/ord
 // Small presentational pieces shared by the order list and order detail page.
 
 const TONE: Record<string, string> = {
-  warn: "text-amber-300 bg-amber-400/10",
-  bad: "text-red-400 bg-red-500/10",
-  ok: "text-emerald-400 bg-emerald-500/10",
+  warn: "text-amber-700 dark:text-amber-300 bg-amber-400/10",
+  bad: "text-red-600 dark:text-red-400 bg-red-500/10",
+  ok: "text-emerald-700 dark:text-emerald-400 bg-emerald-500/10",
   muted: "text-muted bg-line/60",
 };
 
@@ -31,7 +31,7 @@ export function OrderTimeline({ order, compact = false }: { order: OrderLike; co
           <li
             key={s.label}
             className={`relative text-center ${compact ? "text-[10.5px] sm:text-[12px]" : "text-[11px] sm:text-[13px]"} ${
-              done ? "text-charcoal" : s.state === "cur" ? "font-semibold text-amber-300" : s.state === "bad" ? "font-semibold text-red-400" : "text-muted"
+              done ? "text-charcoal" : s.state === "cur" ? "font-semibold text-amber-700 dark:text-amber-300" : s.state === "bad" ? "font-semibold text-red-600 dark:text-red-400" : "text-muted"
             }`}
           >
             {i > 0 && <span className={`absolute left-[calc(-50%+8px)] top-[6px] h-0.5 w-[calc(100%-16px)] ${line}`} />}
@@ -40,9 +40,9 @@ export function OrderTimeline({ order, compact = false }: { order: OrderLike; co
                 done
                   ? "border-terracotta bg-terracotta"
                   : s.state === "cur"
-                    ? "border-amber-300 bg-surface shadow-[0_0_0_4px_rgba(252,211,77,0.18)]"
+                    ? "border-amber-600 dark:border-amber-300 bg-surface shadow-[0_0_0_4px_rgba(252,211,77,0.18)]"
                     : s.state === "bad"
-                      ? "border-red-400 bg-surface shadow-[0_0_0_4px_rgba(248,113,113,0.18)]"
+                      ? "border-red-500 dark:border-red-400 bg-surface shadow-[0_0_0_4px_rgba(248,113,113,0.18)]"
                       : "border-line bg-surface"
               }`}
             />

@@ -471,7 +471,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
             </div>
 
             {error && (
-              <p className="mt-4 rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
+              <p className="mt-4 rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-600 dark:text-red-400">{error}</p>
             )}
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">

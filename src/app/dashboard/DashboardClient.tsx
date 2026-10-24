@@ -27,8 +27,8 @@ const STATUS_STYLES: Record<string, string> = {
   pending: "bg-gold/20 text-terracotta-dark",
   processing: "bg-sky-100 text-sky-700",
   shipped: "bg-indigo-100 text-indigo-700",
-  delivered: "bg-emerald-100 text-emerald-400",
-  cancelled: "bg-red-100 text-red-400",
+  delivered: "bg-emerald-100 text-emerald-700 dark:text-emerald-400",
+  cancelled: "bg-red-100 text-red-600 dark:text-red-400",
 };
 
 export default function DashboardClient() {
@@ -148,7 +148,7 @@ export default function DashboardClient() {
           { order: 499, reward: 39 },
           { order: 699, reward: 49 },
         ].map((t) => (
-          <div key={t.order} className="rounded-2xl border border-line bg-[#fdf1e6] p-5 text-center">
+          <div key={t.order} className="rounded-2xl border border-line bg-terracotta/10 p-5 text-center">
             <p className="text-xs font-medium text-muted">
               Order worth {CURRENCY_SYMBOL}
               {t.order}
@@ -197,7 +197,7 @@ export default function DashboardClient() {
                     {r.status}
                   </span>
                   <span
-                    className={`text-sm font-bold ${r.credited ? "text-emerald-300" : "text-gold"}`}
+                    className={`text-sm font-bold ${r.credited ? "text-emerald-600 dark:text-emerald-300" : "text-gold"}`}
                   >
                     {r.credited ? "+" : ""}
                     {CURRENCY_SYMBOL}

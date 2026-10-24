@@ -150,7 +150,7 @@ export default function OrderDetailClient({ id }: { id: string }) {
       </div>
 
       {error && (
-        <div className="mb-6 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</div>
+        <div className="mb-6 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">{error}</div>
       )}
 
       {/* Progress */}
@@ -241,7 +241,7 @@ export default function OrderDetailClient({ id }: { id: string }) {
               {editable && (
                 <div className="grid grid-cols-2 gap-2.5">
                   <Link href={`/orders/${order._id}/edit`} className={btn}>Edit</Link>
-                  <button onClick={cancel} disabled={busy} className={`${btn} text-red-400 hover:border-red-400 hover:bg-red-500/10`}>
+                  <button onClick={cancel} disabled={busy} className={`${btn} text-red-600 dark:text-red-400 hover:border-red-400 hover:bg-red-500/10`}>
                     Cancel
                   </button>
                 </div>
@@ -283,7 +283,7 @@ function Row({ label, value, accent = false }: { label: string; value: string; a
   return (
     <div className="flex items-center justify-between">
       <dt className="text-muted">{label}</dt>
-      <dd className={accent ? "font-medium text-emerald-400" : "font-medium text-charcoal"}>{value}</dd>
+      <dd className={accent ? "font-medium text-emerald-700 dark:text-emerald-400" : "font-medium text-charcoal"}>{value}</dd>
     </div>
   );
 }
