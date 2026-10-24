@@ -75,7 +75,7 @@ function Column({
   // Duplicate the list so the -50% translate loops seamlessly.
   const loop = [...reviews, ...reviews];
   return (
-    <div className="marquee-col relative overflow-hidden">
+    <div className="marquee-col relative h-full min-h-0 overflow-hidden">
       <div
         className={`marquee-track ${direction === "up" ? "marquee-up" : "marquee-down"}`}
         style={{ "--marquee-duration": duration } as React.CSSProperties}
@@ -123,16 +123,16 @@ export default function TestimonialWall() {
         </div>
 
         {/* RIGHT: the scrolling columns, capped to one viewport height */}
-        <div className="relative h-[70vh] max-h-[640px] min-h-[460px]">
+        <div className="relative h-[70vh] max-h-[640px] min-h-[460px] overflow-hidden">
           {/* top & bottom fade masks */}
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-cream to-transparent" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-20 bg-gradient-to-t from-cream to-transparent" />
 
-          <div className="grid h-full grid-cols-2 gap-4 sm:grid-cols-3">
+          <div className="grid h-full grid-cols-2 grid-rows-1 gap-4 sm:grid-cols-3">
             <Column reviews={c1} direction="up" duration="36s" />
             <Column reviews={c2} direction="down" duration="46s" />
             {/* third column hidden on the smallest screens to avoid cramping */}
-            <div className="hidden sm:block">
+            <div className="hidden h-full min-h-0 sm:block">
               <Column reviews={c3} direction="up" duration="52s" />
             </div>
           </div>
