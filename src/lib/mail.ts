@@ -38,13 +38,14 @@ export async function sendMail(opts: MailOptions): Promise<{ ok: boolean }> {
   const tx = getTransporter();
   if (!tx) return { ok: false };
   try {
-    await tx.sendMail({
+    const info = await tx.sendMail({
       from: MAIL_FROM,
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
       text: opts.text || opts.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
     });
+    console.log(`[mail] sent "${opts.subject}" to ${opts.to} (id: ${info.messageId})`);
     return { ok: true };
   } catch (err) {
     console.error("[mail] send failed:", err instanceof Error ? err.message : err);

@@ -61,10 +61,11 @@ export async function POST(request: Request) {
     const token = await createToken({ id: user._id.toString(), name, email });
     await setAuthCookie(token);
 
-    // Send a welcome email (fire-and-forget; never blocks registration).
+    // Send a welcome email. Awaited so the (serverless) function doesn't shut
+    // down before the email is actually sent. sendMail never throws.
     {
       const { subject, html } = welcomeEmail({ name, referralCode });
-      void sendMail({ to: email, subject, html });
+      await sendMail({ to: email, subject, html });
     }
 
     return NextResponse.json({

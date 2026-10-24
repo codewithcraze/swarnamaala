@@ -148,7 +148,8 @@ export async function POST(request: Request) {
       referralCredited: false,
     });
 
-    // Send an order confirmation email (fire-and-forget).
+    // Send an order confirmation email. Awaited so the function doesn't shut
+    // down before the email is sent. sendMail never throws.
     if (session.email) {
       const { subject, html } = orderConfirmationEmail({
         name: session.name,
@@ -158,7 +159,7 @@ export async function POST(request: Request) {
         currency: CURRENCY,
         paymentMethod,
       });
-      void sendMail({ to: session.email, subject, html });
+      await sendMail({ to: session.email, subject, html });
     }
 
     return NextResponse.json({
