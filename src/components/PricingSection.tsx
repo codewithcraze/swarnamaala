@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PriceTag from "@/components/PriceTag";
 import { PRICING_TIERS, CURRENCY_SYMBOL, EXTRA_MAGNET_PRICE, MAX_QUANTITY, BASE_PACK_QTY } from "@/lib/pricing";
 
 // Pricing cards driven by PRICING_TIERS, so the page always matches checkout.
@@ -77,10 +78,13 @@ export default function PricingSection() {
               <Tiles n={tier.quantity} offset={tier.quantity} />
 
               <h3 className="mb-1 text-[17px] font-semibold">{tier.label}</h3>
-              <p className="text-[46px] font-bold leading-tight tracking-tight sm:text-[54px]">
-                {CURRENCY_SYMBOL}
-                {tier.price}
-              </p>
+              <PriceTag
+                price={tier.price}
+                size="lg"
+                className="!justify-start"
+                priceClassName={best ? "" : "text-charcoal"}
+                wasClassName={best ? "text-onaccent/55" : "text-muted"}
+              />
               <p className={`mt-1.5 text-[15px] ${sub}`}>
                 {CURRENCY_SYMBOL}
                 {tier.perPiece} per magnet

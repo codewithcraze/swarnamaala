@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
+import PriceTag from "@/components/PriceTag";
 import BannerCarousel from "@/components/BannerCarousel";
 import CustomerLove from "@/components/CustomerLove";
 import { openRazorpayCheckout } from "@/lib/razorpay";
@@ -520,7 +521,7 @@ function Step1({ quantity, setQuantity, isCustom, setCustomQuantity, pricing }: 
             )}
             <p className="text-xl sm:text-2xl font-extrabold text-charcoal">{t.quantity}</p>
             <p className="text-xs text-muted">magnets</p>
-            <p className="mt-1 sm:mt-1.5 font-semibold text-terracotta">{CURRENCY_SYMBOL}{t.price}</p>
+            <PriceTag price={t.price} size="md" className="mt-1 sm:mt-1.5" badge={false} />
             <p className="text-[10px] text-muted">{CURRENCY_SYMBOL}{t.perPiece}/each</p>
           </button>
         ))}
@@ -540,11 +541,9 @@ function Step1({ quantity, setQuantity, isCustom, setCustomQuantity, pricing }: 
             className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-line bg-surface text-lg hover:bg-cream shrink-0">+</button>
         </div>
       </div>
-      <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-xl border border-line bg-cream/60 px-4 py-3 text-sm">
+      <div className="mt-4 flex flex-row flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-cream/60 px-4 py-3 text-sm">
         <span className="text-muted">{quantityLabel(quantity)}</span>
-        <span className="font-semibold text-terracotta whitespace-nowrap">
-          {CURRENCY_SYMBOL}{pricing.total}
-        </span>
+        <PriceTag price={pricing.total} size="md" className="whitespace-nowrap" />
       </div>
     </section>
   );
@@ -821,7 +820,7 @@ function OrderSummary({ pricing, quantity, submitting, uploading, user, error, o
       <h3 className="mb-3 text-sm sm:text-base font-semibold text-charcoal">Order summary</h3>
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted text-xs sm:text-sm">{quantityLabel(quantity)}</span>
-        <span className="font-medium text-charcoal">{CURRENCY_SYMBOL}{pricing.subtotal}</span>
+        <PriceTag price={pricing.subtotal} size="sm" priceClassName="text-charcoal" />
       </div>
 
       {/* Coupon code */}

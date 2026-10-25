@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
+import OffersPopup from "@/components/OffersPopup";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -107,6 +108,7 @@ export default function RootLayout({
           <main className="min-h-screen overflow-x-hidden">{children}</main>
           <Footer />
           {/* <WhatsAppFAB /> */}
+          <OffersPopup />
         </AuthProvider>
       </body>
     </html>

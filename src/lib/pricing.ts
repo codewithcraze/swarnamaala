@@ -34,6 +34,17 @@ export const COD_FEE = 0;
 // Customers can order up to 50 magnets in a single order.
 export const MAX_QUANTITY = 50;
 
+// Display-only discount shown on product prices ("₹374 ₹299 · 20% off").
+// The selling price never changes; the struck-through "original" price is
+// derived so that taking this percentage off it gives exactly the real price.
+// Set to 0 to hide the strike-through everywhere.
+export const DISPLAY_DISCOUNT_PCT = 20;
+
+export function compareAtPrice(price: number): number | null {
+  if (!DISPLAY_DISCOUNT_PCT || price <= 0) return null;
+  return Math.round(price / (1 - DISPLAY_DISCOUNT_PCT / 100));
+}
+
 export const CURRENCY = "INR";
 export const CURRENCY_SYMBOL = "\u20B9";
 
