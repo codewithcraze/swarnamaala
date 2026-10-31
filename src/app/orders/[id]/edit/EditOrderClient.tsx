@@ -14,6 +14,9 @@ import {
   EXTRA_MAGNET_PRICE,
   MAX_QUANTITY,
 } from "@/lib/pricing";
+import { canEdit } from "@/lib/orderView";
+import { platformLabel } from "@/lib/platforms";
+import { compressImage } from "@/lib/compressImage";
 
 type Address = {
   fullName: string;
@@ -46,6 +49,8 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
   const [address, setAddress] = useState<Address>(EMPTY_ADDRESS);
 
   const [status, setStatus] = useState<string>("pending");
+  // Marketplace order: only photos + note can change; photo count is fixed.
+  const [market, setMarket] = useState<{ platform: string; externalOrderId: string } | null>(null);
   const [loadingOrder, setLoadingOrder] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -63,7 +68,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
       const o = data.order;
       // Orders that are paid or already in progress are view-only: send the
       // customer to the order details page instead of showing the edit form.
-      if (o.status !== "pending" || o.paymentStatus === "paid") {
+      if (!canEdit(o)) {
         router.replace(`/orders/${orderId}`);
         return;
       }
@@ -71,6 +76,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
       setImages(Array.isArray(o.images) ? o.images : []);
       setNote(o.note ?? "");
       setStatus(o.status ?? "pending");
+      setMarket(o.paymentMethod === "marketplace" ? { platform: platformLabel(o.source), externalOrderId: o.externalOrderId ?? "" } : null);
       setAddress({
         fullName: o.shippingAddress?.fullName ?? "",
         phone: o.shippingAddress?.phone ?? "",
@@ -102,7 +108,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
 
   const pricing = computePricing(quantity) ?? { quantity, subtotal: 0, gst: 0, total: 0 };
   const remaining = quantity - images.length;
-  const editable = status === "pending";
+  const editable = market ? ["pending", "processing"].includes(status) : status === "pending";
   const isCustom = !getTier(quantity);
 
   function setCustomQuantity(value: number) {
@@ -112,7 +118,8 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
 
   async function uploadFile(file: File): Promise<string> {
     const fd = new FormData();
-    fd.append("file", file);
+    // Shrink in the browser first so uploads are quick.
+    fd.append("file", await compressImage(file).catch(() => file));
     const res = await fetch("/api/upload", { method: "POST", body: fd });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error ?? "Upload failed");
@@ -221,10 +228,17 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
         / <span className="text-charcoal">Edit order</span>
       </nav>
 
-      <h1 className="text-2xl font-bold text-charcoal sm:text-3xl">Edit your order</h1>
+      <h1 className="text-2xl font-bold text-charcoal sm:text-3xl">{market ? "Change your photos" : "Edit your order"}</h1>
       <p className="mt-2 text-muted">
-        Update your pack, photos or shipping details. Changes are saved instantly.
+        {market
+          ? `${market.platform} order ${market.externalOrderId} · ${quantity} magnet${quantity === 1 ? "" : "s"}. You can swap photos until your order ships.`
+          : "Update your pack, photos or shipping details. Changes are saved instantly."}
       </p>
+      {market && status === "processing" && (
+        <p className="mt-3 rounded-xl border border-amber-300/50 bg-amber-500/10 px-4 py-2.5 text-sm text-charcoal">
+          Your magnets are already being made. If you change photos now, please also message us on WhatsApp so we use the new ones.
+        </p>
+      )}
 
       {!editable && (
         <div className="mt-6 rounded-2xl border border-line bg-gold/10 p-5">
@@ -244,7 +258,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
       {editable && (
         <form onSubmit={handleSubmit} className="mt-8 space-y-8">
           {/* Quantity */}
-          <section>
+          {!market && <section>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-terracotta">
               1. Pack size
             </h2>
@@ -315,7 +329,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                 </button>
               </div>
             </div>
-          </section>
+          </section>}
 
           {/* Photos */}
           <section>
@@ -422,6 +436,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
 
           {/* Shipping */}
           <section>
+            {!market && (<>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-terracotta">
               3. Shipping details
             </h2>
@@ -448,6 +463,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                 <input value={address.pincode} onChange={(e) => updateAddress("pincode", e.target.value)} className="input" placeholder="6-digit" inputMode="numeric" />
               </Field>
             </div>
+            </>)}
             <Field label="Order note (optional)" className="mt-3">
               <textarea value={note} onChange={(e) => setNote(e.target.value)} className="input min-h-20 resize-y" placeholder="Any special instructions?" />
             </Field>
@@ -455,6 +471,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
 
           {/* Summary + actions */}
           <div className="rounded-2xl border border-line bg-surface p-5 shadow-sm">
+            {!market && (<>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted">{quantityLabel(quantity)}</span>
               <span className="font-medium text-charcoal">
@@ -469,6 +486,7 @@ export default function EditOrderClient({ orderId }: { orderId: string }) {
                 {pricing.total}
               </span>
             </div>
+            </>)}
 
             {error && (
               <p className="mt-4 rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-600 dark:text-red-400">{error}</p>

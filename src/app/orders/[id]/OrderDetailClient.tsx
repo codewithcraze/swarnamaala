@@ -8,7 +8,7 @@ import { OrderTimeline, StatePill, formatDate } from "@/components/OrderParts";
 import { CURRENCY_SYMBOL } from "@/lib/pricing";
 import { platformLabel } from "@/lib/platforms";
 import { payOrder } from "@/lib/payOrder";
-import { viewState, needsPayment, canEdit, STATE_NOTE } from "@/lib/orderView";
+import { viewState, needsPayment, canEdit, canCancel, STATE_NOTE } from "@/lib/orderView";
 
 type Order = {
   _id: string;
@@ -135,6 +135,7 @@ export default function OrderDetailClient({ id }: { id: string }) {
   const s = viewState(order);
   const payable = needsPayment(order);
   const editable = canEdit(order);
+  const cancellable = canCancel(order);
   const total = order.total ?? order.amount;
   const a = order.shippingAddress;
 
@@ -258,11 +259,11 @@ export default function OrderDetailClient({ id }: { id: string }) {
                 </button>
               )}
               {editable && (
-                <div className="grid grid-cols-2 gap-2.5">
-                  <Link href={`/orders/${order._id}/edit`} className={btn}>Edit</Link>
-                  <button onClick={cancel} disabled={busy} className={`${btn} text-red-600 dark:text-red-400 hover:border-red-400 hover:bg-red-500/10`}>
+                <div className={`grid gap-2.5 ${cancellable ? "grid-cols-2" : "grid-cols-1"}`}>
+                  <Link href={`/orders/${order._id}/edit`} className={btn}>{order.paymentMethod === "marketplace" ? "Change photos" : "Edit"}</Link>
+                  {cancellable && <button onClick={cancel} disabled={busy} className={`${btn} text-red-600 dark:text-red-400 hover:border-red-400 hover:bg-red-500/10`}>
                     Cancel
-                  </button>
+                  </button>}
                 </div>
               )}
             </section>

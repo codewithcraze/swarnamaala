@@ -5,6 +5,7 @@ import { Order } from "@/models/Order";
 import { getSessionUser } from "@/lib/auth";
 import { computePricing, quantityLabel, referralReward } from "@/lib/pricing";
 import { isValidUploadUrl } from "@/lib/s3";
+import { canEdit, isMarketplace } from "@/lib/orderView";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -50,9 +51,40 @@ export async function PATCH(request: Request, { params }: Ctx) {
 
   try {
     const body = await request.json();
-    const quantity = Number(body.quantity);
     const images: string[] = Array.isArray(body.images) ? body.images.map(String) : [];
     const note = String(body.note ?? "").trim();
+
+    await connectToDatabase();
+    const existing = await Order.findOne({ _id: id, user: session.id });
+    if (!existing) {
+      return NextResponse.json({ error: "Order not found." }, { status: 404 });
+    }
+
+    // Marketplace orders (paid on Meesho/Flipkart/…): only the photos and the
+    // note can change, and only until the order ships. The number of photos is
+    // fixed by what was bought on the platform.
+    if (isMarketplace(existing)) {
+      if (!canEdit(existing)) {
+        return NextResponse.json(
+          { error: `This order is already ${existing.status} and its photos can no longer be changed.` },
+          { status: 409 }
+        );
+      }
+      if (images.length !== existing.quantity) {
+        return NextResponse.json(
+          { error: `Please add exactly ${existing.quantity} ${existing.quantity === 1 ? "photo" : "photos"}.` },
+          { status: 400 }
+        );
+      }
+      if (!images.every((url) => isValidUploadUrl(url))) {
+        return NextResponse.json({ error: "Please upload your photos before saving." }, { status: 400 });
+      }
+      existing.set({ images, note: note.slice(0, 1000) || undefined });
+      await existing.save();
+      return NextResponse.json({ order: { id: existing._id.toString(), quantity: existing.quantity } });
+    }
+
+    const quantity = Number(body.quantity);
     const address = body.shippingAddress ?? {};
 
     const pricing = computePricing(quantity);
@@ -93,11 +125,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
       return NextResponse.json({ error: "Please enter a valid 6-digit pincode." }, { status: 400 });
     }
 
-    await connectToDatabase();
-    const order = await Order.findOne({ _id: id, user: session.id });
-    if (!order) {
-      return NextResponse.json({ error: "Order not found." }, { status: 404 });
-    }
+    const order = existing;
     if (order.status !== EDITABLE_STATUS || order.paymentStatus === "paid") {
       return NextResponse.json(
         {

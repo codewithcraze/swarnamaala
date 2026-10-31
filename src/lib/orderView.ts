@@ -92,9 +92,21 @@ export function needsPayment(o: OrderLike) {
   return !isCod(o) && (s === "unpaid" || s === "failed");
 }
 
-// Editing / cancelling is only allowed before we start working on the order.
+// Marketplace orders (Meesho, Flipkart…) can have their photos and note
+// changed until the order ships.
+export const MARKETPLACE_EDITABLE = ["pending", "processing"];
+
+// Website orders: editable only before payment and before work starts.
+// Marketplace orders: editable while pending or processing.
 export function canEdit(o: OrderLike) {
+  if (isMarketplace(o)) return MARKETPLACE_EDITABLE.includes(o.status);
   return o.status === "pending" && o.paymentStatus !== "paid";
+}
+
+// Cancelling: only unpaid website orders that haven't started. Marketplace
+// orders are paid on the platform, so they're cancelled there.
+export function canCancel(o: OrderLike) {
+  return !isMarketplace(o) && o.status === "pending" && o.paymentStatus !== "paid";
 }
 
 // MongoDB filter for each tab (used by the API).

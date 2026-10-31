@@ -9,7 +9,7 @@ import { OrderThumbs, OrderTimeline, StatePill, formatDate } from "@/components/
 import { CURRENCY_SYMBOL } from "@/lib/pricing";
 import { platformLabel } from "@/lib/platforms";
 import { payOrder } from "@/lib/payOrder";
-import { TABS, type TabKey, viewState, needsPayment, canEdit, STATE_NOTE } from "@/lib/orderView";
+import { TABS, type TabKey, viewState, needsPayment, canEdit, canCancel, STATE_NOTE } from "@/lib/orderView";
 
 type Order = {
   _id: string;
@@ -211,6 +211,7 @@ export default function OrdersClient() {
             const s = viewState(o);
             const payable = needsPayment(o);
             const editable = canEdit(o);
+            const cancellable = canCancel(o);
             const href = `/orders/${o._id}`;
             return (
               <article
@@ -271,7 +272,7 @@ export default function OrdersClient() {
                     {editable && (
                       <Link href={`/orders/${o._id}/edit`} className={`${btn} flex-1 sm:flex-none`}>Edit</Link>
                     )}
-                    {editable && (
+                    {cancellable && (
                       <button
                         onClick={() => cancel(o)}
                         disabled={busyId === o._id}
