@@ -40,10 +40,11 @@ export async function POST(request: Request) {
     const dup = await Order.findOne({ source: claim.platform, externalOrderId: claim.externalOrderId }).select("_id").lean();
     if (dup) return bad("Photos for this order ID have already been submitted.", 409);
 
-    // Find or create the customer account.
-    let user = await User.findOne({ email: claim.email });
+    // Meesho/Flipkart/Amazon: no email given, so no account. Otherwise find or
+    // create the customer account.
+    let user = claim.email ? await User.findOne({ email: claim.email }) : null;
     let password: string | undefined;
-    if (!user) {
+    if (!user && claim.email) {
       password = generatePassword();
       user = await User.create({
         name: claim.name,
@@ -58,7 +59,10 @@ export async function POST(request: Request) {
     let order;
     try {
       order = await Order.create({
-        user: user._id,
+        user: user?._id ?? null,
+        // Listed in the CRM's separate section, not with main-site orders.
+        entry: "photo-link",
+        customerName: claim.name,
         product: "Custom Photo Magnet",
         quantity,
         unitLabel: `${quantity} Magnet${quantity > 1 ? "s" : ""} · ${platform}`,
@@ -81,23 +85,28 @@ export async function POST(request: Request) {
       throw e;
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://swarnamaala.in";
-    const { subject, html } = marketplaceOrderEmail({
-      name: claim.name,
-      email: claim.email,
-      platform,
-      externalOrderId: claim.externalOrderId,
-      quantity,
-      password,
-      siteUrl,
-    });
-    const mail = await sendMail({ to: claim.email, subject, html });
+    let emailSent = false;
+    if (claim.email) {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://swarnamaala.in";
+      const { subject, html } = marketplaceOrderEmail({
+        name: claim.name,
+        email: claim.email,
+        platform,
+        externalOrderId: claim.externalOrderId,
+        quantity,
+        password,
+        siteUrl,
+      });
+      emailSent = (await sendMail({ to: claim.email, subject, html })).ok;
+    }
 
     return NextResponse.json({
       ok: true,
       orderId: order._id.toString(),
+      externalOrderId: claim.externalOrderId,
+      hasEmail: Boolean(claim.email),
       accountCreated: Boolean(password),
-      emailSent: mail.ok,
+      emailSent,
     });
   } catch (err) {
     console.error("marketplace order error", err);

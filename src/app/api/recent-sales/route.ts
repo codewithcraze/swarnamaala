@@ -15,6 +15,7 @@ type Row = {
   source?: string;
   shippingAddress?: { fullName?: string; city?: string };
   user?: { name?: string } | null;
+  customerName?: string;
 };
 
 export async function GET() {
@@ -30,12 +31,12 @@ export async function GET() {
     })
       .sort({ createdAt: -1 })
       .limit(12)
-      .select("quantity createdAt source shippingAddress.fullName shippingAddress.city user")
+      .select("quantity createdAt source shippingAddress.fullName shippingAddress.city user customerName")
       .populate("user", "name")
       .lean()) as unknown as Row[];
 
     const sales = rows.map((r) => {
-      const full = r.shippingAddress?.fullName || r.user?.name || "";
+      const full = r.shippingAddress?.fullName || r.user?.name || r.customerName || "";
       const first = full.trim().split(/\s+/)[0] || "Someone";
       const market = r.source && r.source !== "website";
       return {

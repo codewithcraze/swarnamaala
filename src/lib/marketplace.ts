@@ -5,7 +5,7 @@ import { SignJWT, jwtVerify } from "jose";
 // their photos through a public link without signing up.
 
 import { isPlatform, type PlatformId } from "@/lib/platforms";
-export { PLATFORMS, MAX_MARKETPLACE_QTY, platformLabel, isPlatform, type PlatformId } from "@/lib/platforms";
+export { PLATFORMS, MAX_MARKETPLACE_QTY, platformLabel, isPlatform, usesPlatformOrderId, type PlatformId } from "@/lib/platforms";
 
 // Platform order ids are compared case-insensitively and without spaces.
 export function normalizeOrderId(raw: unknown) {
@@ -22,6 +22,7 @@ const SCOPE = "marketplace-upload";
 
 export type MarketplaceClaim = {
   name: string;
+  // Empty for Meesho/Flipkart/Amazon orders (no account is created).
   email: string;
   phone: string;
   platform: PlatformId;
@@ -56,6 +57,13 @@ export async function verifyUploadToken(token: string | null | undefined): Promi
 export function bearerToken(request: Request) {
   const h = request.headers.get("authorization") ?? "";
   return h.toLowerCase().startsWith("bearer ") ? h.slice(7).trim() : null;
+}
+
+// Order ID for platforms that don't give the customer one, e.g. "SM-7K3QX9P2".
+export function generateOrderId() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = crypto.randomBytes(8);
+  return "SM-" + Array.from(bytes, (b) => chars[b % chars.length]).join("");
 }
 
 // Readable random password: no look-alike characters, 12 chars.

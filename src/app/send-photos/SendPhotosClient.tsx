@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Confetti from "@/components/Confetti";
 import { compressImage, uploadWithProgress, runLimited } from "@/lib/compressImage";
-import { PLATFORMS, MAX_MARKETPLACE_QTY, type PlatformId } from "@/lib/platforms";
+import { PLATFORMS, MAX_MARKETPLACE_QTY, usesPlatformOrderId, type PlatformId } from "@/lib/platforms";
 
 type Pending = { id: string; preview: string; progress: number; stage: "optimising" | "uploading" };
 type Photo = { url: string; preview: string };
@@ -30,7 +30,7 @@ export default function SendPhotosClient() {
   const [pending, setPending] = useState<Pending[]>([]);
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{ accountCreated: boolean; emailSent: boolean } | null>(null);
+  const [result, setResult] = useState<{ accountCreated: boolean; emailSent: boolean; hasEmail: boolean } | null>(null);
 
   const [error, setError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -52,7 +52,9 @@ export default function SendPhotosClient() {
       const res = await fetch("/api/marketplace/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, platform, externalOrderId }),
+        body: JSON.stringify(
+          withPlatformId ? { name, platform, externalOrderId } : { name, email, phone, platform }
+        ),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Please check your details.");
@@ -130,7 +132,7 @@ export default function SendPhotosClient() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not send your photos.");
-      setResult({ accountCreated: data.accountCreated, emailSent: data.emailSent });
+      setResult({ accountCreated: data.accountCreated, emailSent: data.emailSent, hasEmail: data.hasEmail });
       setStep(2);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -143,6 +145,8 @@ export default function SendPhotosClient() {
   const btn =
     "inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50";
   const platformName = PLATFORMS.find((p) => p.id === platform)?.label ?? "";
+  // Meesho/Flipkart/Amazon: ask for their order ID only (no email/phone).
+  const withPlatformId = usesPlatformOrderId(platform);
 
   return (
     <div className="mx-auto max-w-[760px] px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
@@ -154,7 +158,7 @@ export default function SendPhotosClient() {
           Send us your photos
         </h1>
         <p className="mx-auto mt-2 max-w-md text-[15px] text-muted">
-          Ordered on Meesho, Flipkart, Amazon or elsewhere? Add your order ID and upload your photos. No sign-up needed.
+          Ordered on Meesho, Flipkart, Amazon or elsewhere? Tell us your order and upload your photos. No sign-up needed.
         </p>
       </header>
 
@@ -204,25 +208,32 @@ export default function SendPhotosClient() {
           </fieldset>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <Field label={`${platformName} order ID`} className="sm:col-span-2" hint="Find it in your order details on the app.">
-              <input
-                className="input font-mono uppercase"
-                value={externalOrderId}
-                onChange={(e) => setExternalOrderId(e.target.value)}
-                placeholder="e.g. 123456789012345"
-                required
-                autoComplete="off"
-              />
-            </Field>
-            <Field label="Full name">
+            {withPlatformId && (
+              <Field label={`${platformName} order ID`} className="sm:col-span-2" hint="Find it in your order details on the app.">
+                <input
+                  className="input font-mono uppercase"
+                  value={externalOrderId}
+                  onChange={(e) => setExternalOrderId(e.target.value)}
+                  placeholder="e.g. 123456789012345"
+                  required
+                  autoComplete="off"
+                />
+              </Field>
+            )}
+            <Field label="Full name" className={withPlatformId ? "sm:col-span-2" : ""}>
               <input className="input" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />
             </Field>
-            <Field label="Email" hint="We'll send your order confirmation here.">
-              <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
-            </Field>
-            <Field label="Phone (optional)" className="sm:col-span-2">
-              <input className="input" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" inputMode="tel" />
-            </Field>
+            {!withPlatformId && (
+              <>
+                <Field label="Email" hint="We'll send your order confirmation here.">
+                  <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+                </Field>
+                <Field label="Phone (optional)" className="sm:col-span-2">
+                  <input className="input" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" inputMode="tel" />
+                </Field>
+                <p className="text-xs text-muted sm:col-span-2">We&apos;ll give your order an ID automatically.</p>
+              </>
+            )}
           </div>
 
           <button type="submit" disabled={checking} className={`${btn} mt-6 w-full bg-terracotta text-onaccent hover:bg-terracotta-dark`}>
@@ -352,11 +363,13 @@ export default function SendPhotosClient() {
             <b className="font-mono text-charcoal">{externalOrderId}</b> and will start printing.
           </p>
           <p className="mx-auto mt-4 max-w-md rounded-xl border border-line bg-cream/60 px-4 py-3 text-sm text-muted">
-            {!result.emailSent
-              ? "We couldn't send the confirmation email right now, but your order is saved."
-              : result.accountCreated
-                ? `We've emailed ${email} a confirmation with a password, so you can sign in and track this order.`
-                : `We've emailed a confirmation to ${email}. Sign in with that email to track this order.`}
+            {!result.hasEmail
+              ? `Keep your ${platformName} order ID handy. You'll get updates from ${platformName}, and you can message us on WhatsApp any time.`
+              : !result.emailSent
+                ? "We couldn't send the confirmation email right now, but your order is saved."
+                : result.accountCreated
+                  ? `We've emailed ${email} a confirmation with a password, so you can sign in and track this order.`
+                  : `We've emailed a confirmation to ${email}. Sign in with that email to track this order.`}
           </p>
         </section>
       )}

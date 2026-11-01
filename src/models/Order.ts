@@ -15,12 +15,19 @@ const ShippingAddressSchema = new Schema(
 
 const OrderSchema = new Schema(
   {
+    // Website orders always have a user. Meesho/Flipkart/Amazon orders start
+    // without one; the admin can create a login for them from the CRM later.
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: function (this: { source?: string }) {
+        return !this.source || this.source === "website";
+      },
+      default: null,
       index: true,
     },
+    // Name given on the photo page, for orders without an account.
+    customerName: { type: String, trim: true },
     product: { type: String, required: true, default: "Custom Photo Magnet" },
     quantity: { type: Number, required: true, min: 1 },
     unitLabel: { type: String, required: true },
@@ -46,6 +53,10 @@ const OrderSchema = new Schema(
     // own order id so they can be matched up and never submitted twice.
     source: { type: String, default: "website", index: true },
     externalOrderId: { type: String, trim: true, uppercase: true },
+    // Which CRM list the order belongs to. "photo-link" = sent through the
+    // public send-photos page, "manual" = typed in from the CRM. Both are
+    // listed in the CRM's separate section, not the main Orders list.
+    entry: { type: String, index: true },
     codFee: { type: Number, default: 0, min: 0 },
 
     images: {
